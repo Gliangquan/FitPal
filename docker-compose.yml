@@ -1,0 +1,64 @@
+services:
+  fitpal-backend:
+    build:
+      context: ./FitPal-flask
+    container_name: fitpal-backend
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      HOST: 0.0.0.0
+      PORT: 9903
+      FLASK_DEBUG: "false"
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: DjmIpJ2PdXs4H3Ju1JYIrfvZ
+      DB_NAME: fit
+      JWT_SECRET: fitpal-jwt-secret-please-change-in-production-2026-very-long
+      JWT_EXPIRATION_MS: 86400000
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: AxBzQbS4wjH9R51b
+      MINIO_SECRET_KEY: NNJxorLf4p7Zd1rdJAurEXgP
+      MINIO_SECURE: "false"
+      MINIO_USER_AVATAR_BUCKET: fitpal-user-avatar
+      MINIO_COMMUNITY_POST_BUCKET: fitpal-community-post
+      MINIO_USER_AVATAR_PREFIX: avatars
+      MINIO_COMMUNITY_POST_PREFIX: posts
+      EXPORT_PATH: /app/exports
+    ports:
+      - "9030:9903"
+    networks:
+      - default
+      - shared-infra
+
+  fitpal-frontend:
+    build:
+      context: ./FitPal-frontend
+    container_name: fitpal-frontend
+    restart: unless-stopped
+    depends_on:
+      - fitpal-backend
+    ports:
+      - "9031:80"
+    networks:
+      - default
+
+  fitpal-uniapp-h5:
+    build:
+      context: ./FitPal-uniapp
+      dockerfile: Dockerfile.h5
+    container_name: fitpal-uniapp-h5
+    restart: unless-stopped
+    depends_on:
+      - fitpal-backend
+    ports:
+      - "9032:8080"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+  shared-infra:
+    external: true
+    name: shared-infra

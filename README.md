@@ -1,2 +1,0 @@
-# FitPal
-server sync import

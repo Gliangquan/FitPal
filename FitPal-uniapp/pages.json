@@ -1,0 +1,178 @@
+{
+  "pages": [
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/fit/health",
+      "style": {
+        "navigationBarTitleText": "健康记录"
+      }
+    },
+    {
+      "path": "pages/checkin-calendar/index",
+      "style": {
+        "navigationBarTitleText": "打卡日历"
+      }
+    },
+    {
+      "path": "pages/points-badges/index",
+      "style": {
+        "navigationBarTitleText": "勋章兑换"
+      }
+    },
+    {
+      "path": "pages/fit/questionnaire",
+      "style": {
+        "navigationBarTitleText": "减脂问卷"
+      }
+    },
+    {
+      "path": "pages/fit/plan",
+      "style": {
+        "navigationBarTitleText": "个性化方案"
+      }
+    },
+    {
+      "path": "pages/fit/community",
+      "style": {
+        "navigationBarTitleText": "轻体社区"
+      }
+    },
+    {
+      "path": "pages/fit/community-detail",
+      "style": {
+        "navigationBarTitleText": "文章详情"
+      }
+    },
+    {
+      "path": "pages/fit/community-publish",
+      "style": {
+        "navigationBarTitleText": "发布文章"
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    },
+    {
+      "path": "pages/edit-profile/index",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
+    },
+    {
+      "path": "pages/settings/index",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    },
+    {
+      "path": "pages/change-password/index",
+      "style": {
+        "navigationBarTitleText": "修改密码"
+      }
+    },
+    {
+      "path": "pages/my-coach/index",
+      "style": {
+        "navigationBarTitleText": "我的教练"
+      }
+    },
+    {
+      "path": "pages/coach-certification/index",
+      "style": {
+        "navigationBarTitleText": "教练认证"
+      }
+    },
+    {
+      "path": "pages/coach-workbench/index",
+      "style": {
+        "navigationBarTitleText": "教练工作台"
+      }
+    },
+    {
+      "path": "pages/coach-plan-optimize/index",
+      "style": {
+        "navigationBarTitleText": "方案优化"
+      }
+    },
+    {
+      "path": "pages/consultation/index",
+      "style": {
+        "navigationBarTitleText": "在线咨询"
+      }
+    },
+    {
+      "path": "pages/content-recommend/index",
+      "style": {
+        "navigationBarTitleText": "内容推荐"
+      }
+    },
+    {
+      "path": "pages/content-detail/index",
+      "style": {
+        "navigationBarTitleText": "内容详情"
+      }
+    },
+    {
+      "path": "pages/membership/index",
+      "style": {
+        "navigationBarTitleText": "付费会员"
+      }
+    },
+    {
+      "path": "pages/task-badge-list/index",
+      "style": {
+        "navigationBarTitleText": "任务勋章"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "轻体云管家",
+    "navigationBarBackgroundColor": "#2f65f9",
+    "backgroundColor": "#f4f6fb",
+    "app-plus": {
+      "background": "#f4f6fb"
+    }
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#7b8291",
+    "selectedColor": "#2f65f9",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/icon_fit/shouye.png",
+        "selectedIconPath": "static/icon_fit/shouye.png"
+      },
+      {
+        "pagePath": "pages/fit/community",
+        "text": "社区",
+        "iconPath": "static/icon_fit/xiaoxi.png",
+        "selectedIconPath": "static/icon_fit/xiaoxi.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "static/icon_fit/wode.png",
+        "selectedIconPath": "static/icon_fit/wode.png"
+      }
+    ]
+  }
+}
