@@ -2,12 +2,17 @@
   <view class="page-content recommend-page">
     <view class="hero-section intro-card">
       <view>
-        <text class="text-lg font-bold text-primary">个性化推荐</text>
-        <text class="text-sm text-secondary" style="display:block;margin-top:6rpx;">根据减脂阶段和身体指标推送内容</text>
+        <text class="text-lg font-bold text-primary">{{ pageTitle }}</text>
+        <text class="text-sm text-secondary" style="display:block;margin-top:6rpx;">{{ pageDesc }}</text>
       </view>
     </view>
 
-    <view class="card filter-card">
+    <view v-if="isSeasonMode && seasonTopic" class="card season-card">
+      <text class="season-title">{{ seasonTopic.title }}</text>
+      <text class="season-desc">{{ seasonTopic.routineAdvice || seasonTopic.recipeText || '结合当前节气调整饮食与作息。' }}</text>
+    </view>
+
+    <view class="card filter-card" v-if="!isSeasonMode">
       <text class="text-sm text-secondary">筛选标签</text>
       <picker mode="selector" :range="tagLabels" :value="currentTagIndex" @change="onTagChange">
         <view class="picker-trigger">
@@ -60,6 +65,8 @@ export default {
     return {
       currentTag: '',
       currentTagIndex: 0,
+      mode: 'recommend',
+      seasonTopic: null,
       tags: [
         { label: '全部', value: '' },
         { label: '减脂知识', value: 'weight-loss' },
@@ -72,16 +79,39 @@ export default {
     };
   },
   computed: {
+    isSeasonMode() {
+      return this.mode === 'season';
+    },
+    pageTitle() {
+      return this.isSeasonMode ? '节气专栏' : '个性化推荐';
+    },
+    pageDesc() {
+      return this.isSeasonMode ? '查看当前节气专题与相关推荐内容' : '根据减脂阶段和身体指标推送内容';
+    },
     tagLabels() {
       return this.tags.map((item) => item.label);
     }
   },
+  onLoad(options) {
+    this.mode = options?.mode === 'season' ? 'season' : 'recommend';
+  },
   onShow() {
     this.loadContent();
+    if (this.isSeasonMode) {
+      this.loadSeasonTopic();
+    }
   },
   methods: {
     resolveImageUrl(url) {
       return resolveFileUrl(url);
+    },
+    async loadSeasonTopic() {
+      try {
+        const data = await fitApi.getCurrentSeasonTopic();
+        this.seasonTopic = Array.isArray(data) ? (data[0] || null) : data;
+      } catch (error) {
+        this.seasonTopic = null;
+      }
     },
     async loadContent() {
       try {
@@ -116,6 +146,25 @@ export default {
 
 .intro-card {
   margin-bottom: 16rpx;
+}
+
+.season-card {
+  margin-bottom: 16rpx;
+}
+
+.season-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.season-desc {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: $text-secondary;
 }
 
 .filter-card {

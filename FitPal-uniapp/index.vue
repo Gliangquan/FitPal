@@ -60,7 +60,7 @@
     <view class="card section" style="margin-top: 20rpx;">
       <view class="flex flex-between items-center">
         <text class="text-base font-semibold text-primary">节气专题</text>
-        <text class="text-sm text-theme" @tap="goFitPlan">查看全部</text>
+        <text class="text-sm text-theme" @tap="goSeasonColumn">查看全部</text>
       </view>
       <view v-if="seasonTopic" style="margin-top: 10rpx;">
         <text class="text-base font-semibold text-primary">{{ seasonTopic.title }}</text>
@@ -193,6 +193,9 @@ export default {
     },
     goFitPlan() {
       uni.navigateTo({ url: '/pages/fit/plan' });
+    },
+    goSeasonColumn() {
+      uni.navigateTo({ url: '/pages/content-recommend/index?mode=season' });
     },
     goFitCommunity() {
       uni.switchTab({ url: '/pages/fit/community' });

@@ -39,14 +39,14 @@
       </view>
       <view class="menu-divider" />
 
-      <view class="menu-item" v-if="user.userRole !== 'admin'" @tap="goCoachCertification">
+      <view class="menu-item" v-if="user.userRole === 'coach'" @tap="goCoachCertification">
         <view class="menu-left">
           <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/xianhua.png" mode="aspectFit" /></view>
-          <text class="menu-title">{{ user.userRole === 'coach' ? '教练资质' : '教练认证' }}</text>
+          <text class="menu-title">教练资质</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
-      <view class="menu-divider" v-if="user.userRole !== 'admin'" />
+      <view class="menu-divider" v-if="user.userRole === 'coach'" />
 
       <view class="menu-item" v-if="user.userRole === 'coach'" @tap="goCoachWorkbench">
         <view class="menu-left">

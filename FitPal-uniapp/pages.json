@@ -121,6 +121,12 @@
       }
     },
     {
+      "path": "pages/season-topics/index",
+      "style": {
+        "navigationBarTitleText": "节气专栏"
+      }
+    },
+    {
       "path": "pages/content-detail/index",
       "style": {
         "navigationBarTitleText": "内容详情"

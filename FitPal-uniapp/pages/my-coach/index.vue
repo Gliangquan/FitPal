@@ -142,7 +142,6 @@ export default {
     },
     async loadCoach() {
       try {
-        // 获取我的教练信息（需要后端接口）
         this.coach = await fitApi.getMyCoach();
       } catch (error) {
         this.coach = null;
@@ -150,7 +149,6 @@ export default {
     },
     async loadReviews() {
       try {
-        // 获取我的评价记录（需要后端接口）
         this.reviews = await fitApi.getMyCoachReviews();
       } catch (error) {
         this.reviews = [];
@@ -174,11 +172,10 @@ export default {
         return uni.showToast({ title: '请填写评价内容', icon: 'none' });
       }
       try {
-        // 提交评价（需要后端接口）
         await fitApi.rateCoach({
           coachId: this.coach.id,
           rating: this.rateForm.rating,
-          content: this.rateForm.content
+          content: this.rateForm.content.trim()
         });
         uni.showToast({ title: '评价成功', icon: 'success' });
         this.closeRateDialog();

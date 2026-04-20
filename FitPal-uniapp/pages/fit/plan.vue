@@ -54,9 +54,12 @@
     </view>
 
     <view class="card section-card" v-if="topicTitle">
-      <view class="section-header">
-        <uni-icons type="star-filled" size="18" color="#2f65f9" />
-        <text class="section-title">{{ topicTitle }}</text>
+      <view class="section-header section-header--between">
+        <view class="section-header-main">
+          <uni-icons type="star-filled" size="18" color="#2f65f9" />
+          <text class="section-title">{{ topicTitle }}</text>
+        </view>
+        <text class="section-link" @tap="goSeasonColumn">查看专栏</text>
       </view>
       <text class="section-content">{{ topicGuide || '结合当前节气调整饮食和作息。' }}</text>
     </view>
@@ -130,6 +133,9 @@ export default {
     },
     goQuestionnaire() {
       uni.navigateTo({ url: '/pages/fit/questionnaire' });
+    },
+    goSeasonColumn() {
+      uni.navigateTo({ url: '/pages/content-recommend/index?mode=season' });
     }
   }
 };
@@ -224,6 +230,22 @@ export default {
   align-items: center;
   gap: 10rpx;
   margin-bottom: 10rpx;
+}
+
+.section-header--between {
+  justify-content: space-between;
+}
+
+.section-header-main {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.section-link {
+  font-size: 22rpx;
+  color: $primary-color;
+  flex-shrink: 0;
 }
 
 .section-title {

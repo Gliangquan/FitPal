@@ -64,37 +64,33 @@
       <view class="divider" />
 
       <view class="form-item">
-        <text class="form-label">体脂率</text>
-        <uni-easyinput v-model="form.bodyFatRate" type="digit" placeholder="如 23.4" :clearable="true" class="form-input">
+        <text class="form-label">身高</text>
+        <uni-easyinput v-model="form.heightCm" type="digit" placeholder="如 168" :clearable="true" class="form-input">
           <template v-slot:right>
-            <text class="input-unit">%</text>
+            <text class="input-unit">cm</text>
           </template>
         </uni-easyinput>
       </view>
       <view class="divider" />
 
       <view class="form-item">
-        <text class="form-label">摄入热量</text>
-        <uni-easyinput v-model="form.calorieIntake" type="number" placeholder="如 1650" :clearable="true" class="form-input">
+        <text class="form-label">性别</text>
+        <view class="form-input"><uni-data-checkbox v-model="form.gender" :localdata="genderOptions" /></view>
+      </view>
+      <view class="divider" />
+
+      <view class="form-item">
+        <text class="form-label">年龄</text>
+        <uni-easyinput v-model="form.age" type="number" placeholder="如 28" :clearable="true" class="form-input">
           <template v-slot:right>
-            <text class="input-unit">kcal</text>
+            <text class="input-unit">岁</text>
           </template>
         </uni-easyinput>
       </view>
       <view class="divider" />
 
       <view class="form-item">
-        <text class="form-label">消耗热量</text>
-        <uni-easyinput v-model="form.calorieBurn" type="number" placeholder="如 420" :clearable="true" class="form-input">
-          <template v-slot:right>
-            <text class="input-unit">kcal</text>
-          </template>
-        </uni-easyinput>
-      </view>
-      <view class="divider" />
-
-      <view class="form-item">
-        <text class="form-label">睡眠时长</text>
+        <text class="form-label">睡眠</text>
         <uni-easyinput v-model="form.sleepHours" type="digit" placeholder="如 7.5" :clearable="true" class="form-input">
           <template v-slot:right>
             <text class="input-unit">小时</text>
@@ -144,11 +140,15 @@ export default {
       trendRecords: [],
       trendMin: '-',
       trendMax: '-',
+      genderOptions: [
+        { text: '男', value: 'male' },
+        { text: '女', value: 'female' }
+      ],
       form: {
         weightKg: '',
-        bodyFatRate: '',
-        calorieIntake: '',
-        calorieBurn: '',
+        heightCm: '',
+        gender: 'male',
+        age: '',
         sleepHours: '',
         note: ''
       }
@@ -298,18 +298,18 @@ export default {
       try {
         await fitApi.addHealthRecord({
           weightKg: Number(this.form.weightKg),
-          bodyFatRate: this.form.bodyFatRate ? Number(this.form.bodyFatRate) : undefined,
-          calorieIntake: this.form.calorieIntake ? Number(this.form.calorieIntake) : undefined,
-          calorieBurn: this.form.calorieBurn ? Number(this.form.calorieBurn) : undefined,
+          bodyFatRate: this.form.heightCm ? Number(this.form.heightCm) : undefined,
+          calorieIntake: this.form.gender === 'female' ? 2 : this.form.gender === 'male' ? 1 : undefined,
+          calorieBurn: this.form.age ? Number(this.form.age) : undefined,
           sleepHours: this.form.sleepHours ? Number(this.form.sleepHours) : undefined,
           note: this.form.note
         });
         uni.showToast({ title: '记录成功', icon: 'success' });
         this.form = {
           weightKg: '',
-          bodyFatRate: '',
-          calorieIntake: '',
-          calorieBurn: '',
+          heightCm: '',
+          gender: 'male',
+          age: '',
           sleepHours: '',
           note: ''
         };
@@ -454,6 +454,10 @@ export default {
   :deep(.uni-easyinput) {
     border: none !important;
     background: transparent !important;
+  }
+
+  :deep(.uni-data-checklist) {
+    padding: 0 !important;
   }
 }
 

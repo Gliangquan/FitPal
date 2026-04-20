@@ -259,14 +259,60 @@ def fit_generate_plan():
         if target_calories < 1200:
             target_calories = 1200
 
-        diet_suggestion = f"每日热量控制在{target_calories}kcal；优先高蛋白、低GI碳水，避免含糖饮料。"
-        if questionnaire.get("diet_preference"):
-            diet_suggestion += f" 饮食偏好建议：{questionnaire.get('diet_preference')}。"
-        workout_suggestion = "每周4-5次中等强度运动，结合有氧与力量训练。"
-        if questionnaire.get("sport_preference"):
-            workout_suggestion += f" 运动偏好建议：{questionnaire.get('sport_preference')}。"
-        if questionnaire.get("intensity"):
-            workout_suggestion += f" 当前建议强度：{questionnaire.get('intensity')}。"
+        diet_preference = str(questionnaire.get("diet_preference") or "").strip()
+        sport_preference = str(questionnaire.get("sport_preference") or "").strip()
+        intensity = str(questionnaire.get("intensity") or "").strip().lower()
+
+        diet_food_map = [
+            ("高蛋白", "鸡蛋、鸡胸肉、虾仁、牛肉、鱼肉、无糖酸奶、豆腐"),
+            ("低碳", "西兰花、菠菜、黄瓜、番茄、牛油果、鸡胸肉、虾仁"),
+            ("低脂", "鸡胸肉、鳕鱼、虾仁、玉米、燕麦、西兰花"),
+            ("清淡", "蒸鸡蛋、清炒时蔬、冬瓜汤、鱼肉、杂粮饭"),
+            ("素食", "豆腐、豆浆、毛豆、藜麦、燕麦、西兰花、菌菇"),
+            ("控糖", "燕麦、全麦面包、鸡蛋、黄瓜、番茄、坚果"),
+        ]
+        recommended_foods = []
+        for keyword, foods in diet_food_map:
+            if keyword and keyword in diet_preference:
+                recommended_foods.append(foods)
+        if not recommended_foods:
+            recommended_foods.append("鸡蛋、鸡胸肉、虾仁、牛肉、西兰花、燕麦、苹果")
+
+        diet_suggestion = (
+            f"每日热量控制在{target_calories}kcal；三餐规律，优先高蛋白、低GI碳水，避免含糖饮料、油炸和夜宵。"
+            f" 可优先选择：{'；'.join(recommended_foods)}。"
+        )
+        if diet_preference:
+            diet_suggestion += f" 饮食偏好建议：根据你偏爱的{diet_preference}来搭配主食、蛋白和蔬菜。"
+
+        intensity_map = {
+            "low": "以低强度、易坚持为主，每次20-30分钟",
+            "medium": "以中等强度稳步减脂为主，每次30-45分钟",
+            "high": "以中高强度提升消耗为主，每次45-60分钟",
+        }
+        workout_item_map = [
+            ("慢跑", "慢跑、快走、椭圆机、跳绳"),
+            ("跑", "慢跑、间歇跑、快走"),
+            ("瑜伽", "瑜伽、普拉提、拉伸训练"),
+            ("力量", "深蹲、箭步蹲、俯卧撑、哑铃训练、平板支撑"),
+            ("游泳", "游泳、划船机、核心训练"),
+            ("骑行", "动感单车、户外骑行、臀腿训练"),
+            ("球", "羽毛球、篮球、跳绳、折返跑"),
+        ]
+        recommended_workouts = []
+        for keyword, workouts in workout_item_map:
+            if keyword and keyword in sport_preference:
+                recommended_workouts.append(workouts)
+        if not recommended_workouts:
+            recommended_workouts.append("快走、慢跑、跳绳、深蹲、平板支撑")
+
+        workout_suggestion = (
+            f"每周4-5次运动，结合有氧与力量训练。"
+            f" 推荐项目：{'；'.join(recommended_workouts)}。"
+            f" {intensity_map.get(intensity, '建议从中等强度开始，循序渐进增加训练量')}。"
+        )
+        if sport_preference:
+            workout_suggestion += f" 运动偏好建议：围绕你偏好的{sport_preference}安排训练。"
         if current_topic:
             season_tips = f"{current_topic.get('title')}：{current_topic.get('routine_advice') or ''}"
         else:
