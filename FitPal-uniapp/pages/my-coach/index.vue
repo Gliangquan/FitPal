@@ -69,7 +69,7 @@
           <view class="menu-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
             <uni-icons type="star-filled" size="20" color="#fff" />
           </view>
-          <text class="menu-title">评价教练</text>
+          <text class="menu-title">教练服务评价</text>
         </view>
         <uni-icons type="forward" size="16" color="#c0c4cc" />
       </view>
@@ -77,7 +77,7 @@
 
     <!-- 我的评价记录 -->
     <view class="reviews-card" v-if="reviews.length">
-      <view class="card-title">我的评价</view>
+      <view class="card-title">我的服务评价</view>
       <view class="review-item" v-for="item in reviews" :key="item.id">
         <view class="review-header">
           <uni-rate :value="item.rating" size="14" readonly />
@@ -90,10 +90,10 @@
     <!-- 评价弹窗 -->
     <uni-popup ref="ratePopup" type="center">
       <view class="rate-dialog">
-        <text class="dialog-title">评价教练</text>
+        <text class="dialog-title">教练服务评价</text>
         
         <view class="rate-section">
-          <text class="rate-label">服务评分</text>
+          <text class="rate-label">服务评价评分</text>
           <uni-rate v-model="rateForm.rating" size="24" />
         </view>
 
@@ -120,6 +120,7 @@
 <script>
 import { fitApi } from '@/utils/api.js';
 import { resolveFileUrl } from '@/utils/request.js';
+import { ensureRoleAccess } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -133,6 +134,7 @@ export default {
     };
   },
   onShow() {
+    if (!ensureRoleAccess(['user', 'coach', 'admin'])) return;
     this.loadCoach();
     this.loadReviews();
   },

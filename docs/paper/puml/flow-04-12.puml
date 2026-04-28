@@ -1,0 +1,20 @@
+@startuml 教练登录注册模块流程图
+' 图4-12 登录注册模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:打开小程序，进入登录页面;
+:输入账号和密码并登录;
+if (验证通过且角色正确?) then (是)
+  :跳转教练工作台;
+else (否)
+  :提示错误信息;
+endif
+stop
+
+@enduml

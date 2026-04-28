@@ -108,7 +108,11 @@ const resolveFileUrl = (url) => {
   }
 
   if (raw.startsWith('/api/')) {
-    return `${getApiOrigin()}${raw}`;
+    const origin = getApiOrigin();
+    if (origin && origin !== '/api') {
+      return `${origin}${raw}`;
+    }
+    return raw;
   }
 
   if (raw.startsWith('/')) {

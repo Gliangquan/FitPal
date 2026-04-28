@@ -3,9 +3,9 @@
     <view class="hero-section">
       <view class="flex flex-between items-center">
         <view>
-          <text class="text-lg font-bold text-primary">教练工作台</text>
+          <text class="text-lg font-bold text-primary">在线咨询回复</text>
           <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">
-            待回复咨询 {{ todoList.length }} 条
+            待回复咨询 {{ todoList.length }} 条，可继续提供会员定制服务
           </text>
         </view>
         <button size="mini" type="default" @tap="loadTodo">刷新</button>
@@ -20,8 +20,8 @@
         </view>
         <text class="question">{{ item.question || '（无内容）' }}</text>
         <view class="item-actions">
-          <button class="btn-sub btn-opt" @tap="goOptimize(item)">优化用户方案</button>
-          <button class="btn-sub btn-reply" @tap="openReply(item)">回复咨询</button>
+          <button class="btn-sub btn-opt" @tap="goOptimize(item)">减脂方案优化</button>
+          <button class="btn-sub btn-reply" @tap="openReply(item)">在线咨询回复</button>
         </view>
       </view>
     </view>
@@ -33,7 +33,7 @@
 
     <uni-popup ref="replyPopup" type="center">
       <view class="reply-dialog" v-if="currentItem">
-        <text class="dialog-title">回复咨询</text>
+        <text class="dialog-title">在线咨询回复</text>
         <view class="question-box">
           <text class="text-sm text-muted">用户提问</text>
           <text class="dialog-question">{{ currentItem.question }}</text>
@@ -60,6 +60,7 @@
 
 <script>
 import { fitApi } from '@/utils/api.js';
+import { ensureRoleAccess } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -71,6 +72,7 @@ export default {
     };
   },
   onShow() {
+    if (!ensureRoleAccess(['coach', 'admin'])) return;
     this.loadTodo();
   },
   methods: {
@@ -80,7 +82,8 @@ export default {
     },
     async loadTodo() {
       try {
-        this.todoList = await fitApi.coachTodoConsultations();
+        const rows = await fitApi.coachTodoConsultations();
+        this.todoList = Array.isArray(rows) ? rows.map((item) => ({ ...item, userId: item.userId || item.user_id })) : [];
       } catch (error) {
         this.todoList = [];
         uni.showToast({ title: error.message || '加载失败', icon: 'none' });

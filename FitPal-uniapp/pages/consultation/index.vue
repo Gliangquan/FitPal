@@ -19,7 +19,7 @@
     <view class="empty-card" v-else>
       <uni-icons type="chatbubble" size="48" color="#c0c4cc" />
       <text class="empty-title">还没有咨询记录</text>
-      <text class="empty-desc">有问题随时向教练咨询</text>
+      <text class="empty-desc">有问题可随时发起在线咨询</text>
     </view>
 
     <!-- 发起咨询按钮 -->
@@ -30,7 +30,7 @@
     <!-- 咨询弹窗 -->
     <uni-popup ref="consultPopup" type="center">
       <view class="consult-dialog">
-        <text class="dialog-title">向教练咨询</text>
+        <text class="dialog-title">在线咨询</text>
 
         <view class="consult-section">
           <text class="consult-label">详细描述</text>
@@ -78,6 +78,7 @@
 
 <script>
 import { fitApi } from '@/utils/api.js';
+import { ensureRoleAccess } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -95,6 +96,7 @@ export default {
     };
   },
   onShow() {
+    if (!ensureRoleAccess(['user', 'admin'])) return;
     this.loadConsultations();
   },
   methods: {

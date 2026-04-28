@@ -1,0 +1,32 @@
+@startuml 用户用例图
+' 图3-1 用户用例图（与用例描述表3.1~3.10一一对应）
+
+left to right direction
+
+actor "普通用户" as user
+
+rectangle "轻体云管家微信小程序" {
+    usecase "登录注册" as UC1
+    usecase "健康数据记录" as UC2
+    usecase "填写健康问卷" as UC3
+    usecase "个性化减脂方案" as UC4
+    usecase "在线咨询" as UC5
+    usecase "积分兑换" as UC6
+    usecase "社区互动" as UC7
+    usecase "会员服务" as UC8
+    usecase "教练服务评价" as UC9
+    usecase "个人信息管理" as UC10
+}
+
+user -- UC1
+user -- UC2
+user -- UC3
+user -- UC4
+user -- UC5
+user -- UC6
+user -- UC7
+user -- UC8
+user -- UC9
+user -- UC10
+
+@enduml

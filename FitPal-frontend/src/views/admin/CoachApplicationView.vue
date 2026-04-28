@@ -1,5 +1,5 @@
 <template>
-  <a-card title="教练审核" :bordered="false">
+  <a-card title="审核教练资质" :bordered="false">
     <a-space style="margin-bottom: 12px" wrap>
       <a-select v-model:value="query.status" allow-clear placeholder="状态" style="width: 180px">
         <a-select-option value="pending">待审核</a-select-option>

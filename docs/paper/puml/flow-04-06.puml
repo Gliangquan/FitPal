@@ -1,0 +1,21 @@
+@startuml 在线咨询模块流程图
+' 图4-6 在线咨询模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入咨询页面;
+:选择类型，填写问题;
+:选择教练并提交;
+if (内容校验通过?) then (是)
+  :保存记录，通知教练;
+else (否)
+  :提示内容违规或超限;
+endif
+stop
+
+@enduml

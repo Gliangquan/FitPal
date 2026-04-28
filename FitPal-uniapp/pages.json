@@ -15,7 +15,7 @@
     {
       "path": "pages/fit/health",
       "style": {
-        "navigationBarTitleText": "健康记录"
+        "navigationBarTitleText": "健康数据记录"
       }
     },
     {
@@ -27,13 +27,13 @@
     {
       "path": "pages/points-badges/index",
       "style": {
-        "navigationBarTitleText": "勋章兑换"
+        "navigationBarTitleText": "积分兑换"
       }
     },
     {
       "path": "pages/fit/questionnaire",
       "style": {
-        "navigationBarTitleText": "减脂问卷"
+        "navigationBarTitleText": "填写健康问卷"
       }
     },
     {
@@ -81,7 +81,7 @@
     {
       "path": "pages/change-password/index",
       "style": {
-        "navigationBarTitleText": "修改密码"
+        "navigationBarTitleText": "登录注册"
       }
     },
     {
@@ -105,7 +105,25 @@
     {
       "path": "pages/coach-plan-optimize/index",
       "style": {
-        "navigationBarTitleText": "方案优化"
+        "navigationBarTitleText": "减脂方案优化"
+      }
+    },
+    {
+      "path": "pages/coach-user-data/index",
+      "style": {
+        "navigationBarTitleText": "查看用户数据"
+      }
+    },
+    {
+      "path": "pages/coach-service-reviews/index",
+      "style": {
+        "navigationBarTitleText": "查看服务评价"
+      }
+    },
+    {
+      "path": "pages/coach-member-service/index",
+      "style": {
+        "navigationBarTitleText": "会员定制服务"
       }
     },
     {
@@ -135,7 +153,7 @@
     {
       "path": "pages/membership/index",
       "style": {
-        "navigationBarTitleText": "付费会员"
+        "navigationBarTitleText": "会员服务"
       }
     },
     {

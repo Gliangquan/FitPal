@@ -1,0 +1,21 @@
+@startuml 积分兑换模块流程图
+' 图4-7 积分兑换模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入积分商城;
+:选择要兑换的勋章;
+:点击兑换;
+if (积分充足?) then (是)
+  :扣除积分，授予勋章;
+else (否)
+  :提示积分不足;
+endif
+stop
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml 查看服务评价模块流程图
+' 图4-18 查看服务评价模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入评价管理页面;
+:设置查询条件;
+if (有评价记录?) then (是)
+  :展示评价列表和统计;
+else (否)
+  :提示暂无评价;
+endif
+stop
+
+@enduml

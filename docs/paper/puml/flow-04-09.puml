@@ -1,0 +1,21 @@
+@startuml 会员服务模块流程图
+' 图4-9 会员服务模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入会员页面;
+:选择会员套餐;
+:选择支付方式并确认;
+if (支付成功?) then (是)
+  :开通会员功能;
+else (否)
+  :提示支付失败;
+endif
+stop
+
+@enduml

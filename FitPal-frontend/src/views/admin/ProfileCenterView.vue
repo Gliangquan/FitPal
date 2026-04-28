@@ -1,5 +1,5 @@
 <template>
-  <a-card title="个人中心" :bordered="false">
+  <a-card title="后台登录" :bordered="false">
     <a-row :gutter="24">
       <a-col :xs="24" :md="8" :lg="7">
         <div class="avatar-panel">

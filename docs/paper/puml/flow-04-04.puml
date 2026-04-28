@@ -1,0 +1,22 @@
+@startuml 填写健康问卷模块流程图
+' 图4-4 填写健康问卷模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入问卷页面;
+:填写减脂目标、身体数据、
+运动基础、饮食偏好等信息;
+:点击提交;
+if (数据完整性校验通过?) then (是)
+  :保存问卷，返回成功提示;
+else (否)
+  :提示必填项缺失;
+endif
+stop
+
+@enduml

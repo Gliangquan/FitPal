@@ -1,0 +1,511 @@
+# FitPal轻体云管家系统核心代码
+# 后端：Python Flask
+# 前端：uni-app
+
+@app.route('/api/user/login', methods=['POST'])
+def user_login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return jsonify({'code': 400, 'msg': '账号或密码不能为空'})
+    user = User.query.filter_by(username=username).first()
+    if not user or user.password != md5(password):
+        return jsonify({'code': 401, 'msg': '账号或密码错误'})
+    if user.status == 'disabled':
+        return jsonify({'code': 403, 'msg': '账号已被禁用'})
+    token = generate_token(user.id)
+    return jsonify({'code': 200, 'data': {'token': token, 'user': user.to_dict()}})
+@app.route('/api/user/register', methods=['POST'])
+def user_register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    phone = data.get('phone')
+    if len(username) < 4:
+        return jsonify({'code': 400, 'msg': '账号长度不能少于4位'})
+    if len(password) < 6:
+        return jsonify({'code': 400, 'msg': '密码长度不能少于6位'})
+    if User.query.filter_by(username=username).first():
+        return jsonify({'code': 400, 'msg': '该账号已被注册'})
+    user = User(username=username, password=md5(password), phone=phone)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'code': 200, 'data': {'user_id': user.id}})
+
+# ========== 3. 健康记录保存接口 ==========
+@app.route('/api/health/record', methods=['POST'])
+@login_required
+def save_health_record():
+    data = request.get_json()
+    user_id = g.user_id
+    record = HealthRecord(
+        user_id=user_id,
+        record_date=data.get('record_date'),
+        weight_kg=data.get('weight_kg'),
+        body_fat_pct=data.get('body_fat_pct'),
+        calorie_intake=data.get('calorie_intake'),
+        calorie_burn=data.get('calorie_burn'),
+        sleep_hours=data.get('sleep_hours'),
+        notes=data.get('notes')
+    )
+    db.session.add(record)
+    db.session.commit()
+    check_and_award_points(user_id, 'health_record')
+    return jsonify({'code': 200, 'data': {'record_id': record.id}})
+
+# ========== 4. 个性化方案生成接口 ==========
+@app.route('/api/plan/generate', methods=['POST'])
+@login_required
+def generate_plan():
+    user_id = g.user_id
+    questionnaire = Questionnaire.query.filter_by(user_id=user_id).order_by(Questionnaire.id.desc()).first()
+    if not questionnaire:
+        return jsonify({'code': 400, 'msg': '请先完成健康问卷'})
+    height = questionnaire.height_cm
+    weight = questionnaire.current_weight_kg
+    age = questionnaire.age
+    gender = questionnaire.gender
+    if gender == 'male':
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5
+    else:
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161
+    target_weight = questionnaire.target_weight_kg
+    goal_cycle = questionnaire.goal_cycle_days
+    weight_diff = weight - target_weight
+    daily_deficit = (weight_diff * 7700) / goal_cycle
+    calorie_target = int(bmr - daily_deficit)
+    diet_suggestion = generate_diet_suggestion(questionnaire.diet_preference, calorie_target)
+    workout_suggestion = generate_workout_suggestion(questionnaire.sport_base)
+    solar_term = get_current_solar_term()
+    solar_advice = get_solar_health_advice(solar_term)
+    plan = PersonalizedPlan(
+        user_id=user_id,
+        questionnaire_id=questionnaire.id,
+        plan_type='system',
+        bmr=bmr,
+        daily_calorie_target=calorie_target,
+        diet_suggestion=diet_suggestion,
+        workout_suggestion=workout_suggestion + '\n【节气养生】' + solar_advice,
+        valid_days=goal_cycle
+    )
+    db.session.add(plan)
+    db.session.commit()
+    return jsonify({'code': 200, 'data': {'plan_id': plan.id, 'plan': plan.to_dict()}})
+
+# ========== 5. 社区发帖接口 ==========
+@app.route('/api/community/post', methods=['POST'])
+@login_required
+def create_post():
+    data = request.get_json()
+    user_id = g.user_id
+    title = data.get('title')
+    content = data.get('content')
+    if not title or not content:
+        return jsonify({'code': 400, 'msg': '标题和内容不能为空'})
+    if check_sensitive_words(title) or check_sensitive_words(content):
+        return jsonify({'code': 400, 'msg': '内容包含违规信息'})
+    post = CommunityPost(
+        user_id=user_id,
+        title=title,
+        content=content,
+        category=data.get('category', 'share'),
+        image_urls=json.dumps(data.get('image_urls', []))
+    )
+    db.session.add(post)
+    db.session.commit()
+    award_points(user_id, 'post', 10)
+    return jsonify({'code': 200, 'data': {'post_id': post.id}})
+
+# ========== 6. 积分兑换接口 ==========
+@app.route('/api/points/exchange', methods=['POST'])
+@login_required
+def exchange_medal():
+    data = request.get_json()
+    user_id = g.user_id
+    medal_id = data.get('medal_id')
+    medal = Medal.query.get(medal_id)
+    if not medal or medal.status != 'on_sale':
+        return jsonify({'code': 400, 'msg': '勋章不存在或已下架'})
+    account = PointAccount.query.filter_by(user_id=user_id).first()
+    if account.available_point < medal.required_points:
+        return jsonify({'code': 400, 'msg': '积分不足'})
+    account.available_point -= medal.required_points
+    user_medal = UserMedal(user_id=user_id, medal_id=medal_id)
+    db.session.add(user_medal)
+    db.session.commit()
+    return jsonify({'code': 200, 'data': {'remaining_points': account.available_point}})
+
+# ========== 7. 教练认证申请接口 ==========
+@app.route('/api/coach/apply', methods=['POST'])
+@login_required
+def coach_apply():
+    data = request.get_json()
+    user_id = g.user_id
+    exist = CoachCertification.query.filter_by(user_id=user_id, status='pending').first()
+    if exist:
+        return jsonify({'code': 400, 'msg': '您有申请正在审核中'})
+    cert = CoachCertification(
+        user_id=user_id,
+        real_name=data.get('real_name'),
+        cert_type=data.get('cert_type'),
+        cert_no=data.get('cert_no'),
+        expertise=data.get('expertise'),
+        cert_image=data.get('cert_image'),
+        status='pending'
+    )
+    db.session.add(cert)
+    db.session.commit()
+    return jsonify({'code': 200, 'data': {'cert_id': cert.id}})
+
+# ========== 8. 教练方案优化接口 ==========
+@app.route('/api/coach/plan/optimize', methods=['POST'])
+@login_required
+def optimize_plan():
+    data = request.get_json()
+    coach_id = g.user_id
+    user_id = data.get('user_id')
+    original_plan_id = data.get('original_plan_id')
+    original = PersonalizedPlan.query.get(original_plan_id)
+    if not original:
+        return jsonify({'code': 400, 'msg': '原方案不存在'})
+    new_plan = PersonalizedPlan(
+        user_id=user_id,
+        questionnaire_id=original.questionnaire_id,
+        plan_type='coach_optimized',
+        coach_id=coach_id,
+        bmr=original.bmr,
+        daily_calorie_target=original.daily_calorie_target,
+        diet_suggestion=data.get('diet_suggestion'),
+        workout_suggestion=data.get('workout_suggestion'),
+        valid_days=data.get('valid_days')
+    )
+    db.session.add(new_plan)
+    original.status = 'optimized'
+    db.session.commit()
+    return jsonify({'code': 200, 'data': {'new_plan_id': new_plan.id}})
+
+# ========== 9. 教练回复咨询接口 ==========
+@app.route('/api/coach/consult/reply', methods=['POST'])
+@login_required
+def reply_consult():
+    data = request.get_json()
+    coach_id = g.user_id
+    consult_id = data.get('consult_id')
+    consult = OnlineConsult.query.get(consult_id)
+    if not consult or consult.coach_user_id != coach_id:
+        return jsonify({'code': 403, 'msg': '无权操作'})
+    if consult.status != 'pending':
+        return jsonify({'code': 400, 'msg': '该咨询已回复'})
+    consult.reply = data.get('reply')
+    consult.status = 'replied'
+    consult.reply_time = datetime.now()
+    db.session.commit()
+    return jsonify({'code': 200})
+
+# ========== 10. 管理员审核教练接口 ==========
+@app.route('/api/admin/coach/audit', methods=['POST'])
+@admin_required
+def audit_coach():
+    data = request.get_json()
+    cert_id = data.get('cert_id')
+    result = data.get('result')
+    reason = data.get('reason')
+    cert = CoachCertification.query.get(cert_id)
+    if not cert:
+        return jsonify({'code': 404, 'msg': '申请不存在'})
+    cert.status = result
+    cert.reject_reason = reason if result == 'rejected' else None
+    if result == 'approved':
+        user = User.query.get(cert.user_id)
+        user.role = 'coach'
+    db.session.commit()
+    return jsonify({'code': 200})
+
+# ========== 11. uni-app 登录页面核心代码 ==========
+<template>
+<view class="login-container">
+<input v-model="username" placeholder="请输入账号" />
+<input v-model="password" type="password" placeholder="请输入密码" />
+<button @click="handleLogin">登录</button>
+<navigator url="/pages/register/index">去注册</navigator>
+</view>
+</template>
+<script>
+export default {
+data() {
+return { username: '', password: '' }
+},
+methods: {
+async handleLogin() {
+if (!this.username || !this.password) {
+uni.showToast({ title: '账号密码不能为空', icon: 'none' })
+return
+}
+const res = await uni.request({
+url: 'https://api.fitpal.com/api/user/login',
+method: 'POST',
+data: { username: this.username, password: this.password }
+})
+if (res.data.code === 200) {
+uni.setStorageSync('token', res.data.data.token)
+uni.switchTab({ url: '/pages/home/index' })
+} else {
+uni.showToast({ title: res.data.msg, icon: 'none' })
+}
+}
+}
+}
+</script>
+
+# ========== 12. uni-app 健康记录页面核心代码 ==========
+<template>
+<view class="record-container">
+<picker mode="date" :value="recordDate" @change="onDateChange">
+<view>{{recordDate}}</view>
+</picker>
+<input v-model="weight" type="digit" placeholder="体重(kg)" />
+<input v-model="bodyFat" type="digit" placeholder="体脂率(%)" />
+<input v-model="calorieIntake" type="number" placeholder="热量摄入(kcal)" />
+<input v-model="calorieBurn" type="number" placeholder="热量消耗(kcal)" />
+<button @click="saveRecord">保存记录</button>
+</view>
+</template>
+<script>
+export default {
+data() {
+return { recordDate: '', weight: '', bodyFat: '', calorieIntake: '', calorieBurn: '' }
+},
+methods: {
+async saveRecord() {
+const res = await uni.request({
+url: 'https://api.fitpal.com/api/health/record',
+method: 'POST',
+header: { Authorization: uni.getStorageSync('token') },
+data: {
+record_date: this.recordDate,
+weight_kg: this.weight,
+body_fat_pct: this.bodyFat,
+calorie_intake: this.calorieIntake,
+calorie_burn: this.calorieBurn
+}
+})
+if (res.data.code === 200) {
+uni.showToast({ title: '保存成功' })
+}
+}
+}
+}
+</script>
+
+# ========== 13. Vue.js 管理员后台登录核心代码 ==========
+<template>
+<div class="login-page">
+<h2>轻体云管家后台管理</h2>
+<el-input v-model="username" placeholder="管理员账号" />
+<el-input v-model="password" type="password" placeholder="密码" />
+<el-input v-model="captcha" placeholder="验证码" />
+<el-button type="primary" @click="handleLogin">登录</el-button>
+</div>
+</template>
+<script>
+export default {
+data() {
+return { username: '', password: '', captcha: '' }
+},
+methods: {
+async handleLogin() {
+const res = await this.$axios.post('/api/admin/login', {
+username: this.username,
+password: this.password,
+captcha: this.captcha
+})
+if (res.code === 200) {
+localStorage.setItem('admin_token', res.data.token)
+this.$router.push('/dashboard')
+} else {
+this.$message.error(res.msg)
+}
+}
+}
+}
+</script>
+
+# ========== 14. Vue.js 教练审核核心代码 ==========
+<template>
+<div class="audit-page">
+<el-table :data="certList">
+<el-table-column prop="real_name" label="真实姓名" />
+<el-table-column prop="cert_type" label="证书类型" />
+<el-table-column prop="cert_no" label="证书编号" />
+<el-table-column label="操作">
+<template slot-scope="scope">
+<el-button @click="approve(scope.row)">通过</el-button>
+<el-button @click="reject(scope.row)">驳回</el-button>
+</template>
+</el-table-column>
+</el-table>
+<el-dialog :visible.sync="rejectDialogVisible">
+<el-input v-model="rejectReason" type="textarea" placeholder="请输入驳回原因" />
+<el-button @click="confirmReject">确认驳回</el-button>
+</el-dialog>
+</div>
+</template>
+<script>
+export default {
+data() {
+return { certList: [], rejectDialogVisible: false, rejectReason: '', currentCert: null }
+},
+mounted() {
+this.loadCertList()
+},
+methods: {
+async loadCertList() {
+const res = await this.$axios.get('/api/admin/coach/pending')
+this.certList = res.data
+},
+approve(row) {
+this.$axios.post('/api/admin/coach/audit', { cert_id: row.id, result: 'approved' })
+this.loadCertList()
+},
+reject(row) {
+this.currentCert = row
+this.rejectDialogVisible = true
+},
+async confirmReject() {
+await this.$axios.post('/api/admin/coach/audit', {
+cert_id: this.currentCert.id,
+result: 'rejected',
+reason: this.rejectReason
+})
+this.rejectDialogVisible = false
+this.loadCertList()
+}
+}
+}
+</script>
+
+@app.route('/api/admin/community/audit', methods=['POST'])
+@admin_required
+def audit_community_content():
+data = request.get_json()
+content_id = data.get('content_id')
+content_type = data.get('content_type')
+result = data.get('result')
+reason = data.get('reason')
+notify_user = data.get('notify_user', False)
+if content_type == 'post':
+content = CommunityPost.query.get(content_id)
+else:
+content = CommunityComment.query.get(content_id)
+if not content:
+return jsonify({'code': 404, 'msg': '内容不存在'})
+content.status = result
+content.audit_time = datetime.now()
+content.audit_reason = reason
+if result in ['hidden', 'deleted']:
+user = User.query.get(content.user_id)
+user.violation_count += 1
+if notify_user:
+send_system_message(content.user_id, f'您的内容因"{reason}"被{result}', content_type)
+db.session.commit()
+return jsonify({'code': 200, 'data': {'content_id': content_id, 'status': result}})
+
+<template>
+<div class="content-audit-page">
+<el-tabs v-model="activeTab">
+<el-tab-pane label="待审核" name="pending">
+<el-table :data="pendingList">
+<el-table-column prop="title" label="标题" />
+<el-table-column prop="author" label="作者" />
+<el-table-column prop="create_time" label="发布时间" />
+<el-table-column label="操作">
+<template slot-scope="scope">
+<el-button @click="viewDetail(scope.row)">查看</el-button>
+<el-button type="success" @click="approve(scope.row)">通过</el-button>
+<el-button type="danger" @click="reject(scope.row)">下架</el-button>
+</template>
+</el-table-column>
+</el-table>
+</el-tab-pane>
+<el-tab-pane label="已处理" name="processed">
+<el-table :data="processedList">
+<el-table-column prop="title" label="标题" />
+<el-table-column prop="status" label="状态" />
+<el-table-column prop="audit_time" label="处理时间" />
+</el-table>
+</el-tab-pane>
+</el-tabs>
+<el-dialog :visible.sync="detailVisible" title="内容详情">
+<div class="content-detail">
+<h3>{{ currentContent.title }}</h3>
+<p>{{ currentContent.content }}</p>
+<img v-for="img in currentContent.images" :src="img" :key="img" />
+</div>
+<div class="audit-actions">
+<el-button type="success" @click="approve(currentContent)">通过</el-button>
+<el-button type="warning" @click="hide(currentContent)">隐藏</el-button>
+<el-button type="danger" @click="showDeleteDialog(currentContent)">删除</el-button>
+</div>
+</el-dialog>
+<el-dialog :visible.sync="deleteVisible" title="删除确认">
+<el-input v-model="deleteReason" type="textarea" placeholder="请输入删除原因" />
+<el-checkbox v-model="notifyUser">通知用户</el-checkbox>
+<div slot="footer">
+<el-button @click="deleteVisible = false">取消</el-button>
+<el-button type="danger" @click="confirmDelete">确认删除</el-button>
+</div>
+</el-dialog>
+</div>
+</template>
+<script>
+export default {
+data() {
+return {
+activeTab: 'pending',
+pendingList: [],
+processedList: [],
+detailVisible: false,
+deleteVisible: false,
+currentContent: null,
+deleteReason: '',
+notifyUser: false}},
+mounted() {
+this.loadPendingList()},
+methods: {
+async loadPendingList() {
+const res = await this.$axios.get('/api/admin/community/pending')
+this.pendingList = res.data},
+approve(row) {
+this.$axios.post('/api/admin/community/audit', {
+content_id: row.id,
+content_type: 'post',
+result: 'approved'})
+this.loadPendingList()},
+hide(row) {
+this.$axios.post('/api/admin/community/audit', {
+content_id: row.id,
+content_type: 'post',
+result: 'hidden',
+reason: '内容不适宜展示'})
+this.loadPendingList()
+},
+showDeleteDialog(row) {
+this.currentContent = row
+this.deleteVisible = true
+},
+async confirmDelete() {
+await this.$axios.post('/api/admin/community/audit', {
+content_id: this.currentContent.id,
+content_type: 'post',
+result: 'deleted',
+reason: this.deleteReason,
+notify_user: this.notifyUser
+})
+this.deleteVisible = false
+this.detailVisible = false
+this.loadPendingList()
+}
+}
+}
+</script>

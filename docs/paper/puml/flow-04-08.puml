@@ -1,0 +1,22 @@
+@startuml 社区互动模块流程图
+' 图4-8 社区互动模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入社区页面;
+:填写标题、内容、分类;
+:上传图片(可选);
+:点击发布;
+if (内容审核通过?) then (是)
+  :保存帖子，触发积分奖励;
+else (否)
+  :提示内容违规;
+endif
+stop
+
+@enduml

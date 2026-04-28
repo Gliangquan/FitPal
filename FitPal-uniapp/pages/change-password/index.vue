@@ -5,8 +5,8 @@
         <image src="/static/icon_fit/yaoxiang.png" class="intro-icon" mode="aspectFit" />
       </view>
       <view class="intro-content">
-        <text class="text-lg font-bold text-primary">修改密码</text>
-        <text class="text-sm text-secondary intro-desc">为了账户安全，建议定期更换密码</text>
+        <text class="text-lg font-bold text-primary">登录注册</text>
+        <text class="text-sm text-secondary intro-desc">当前提供已登录账号的密码维护能力</text>
       </view>
     </view>
 

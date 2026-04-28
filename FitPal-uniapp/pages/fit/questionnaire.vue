@@ -5,8 +5,8 @@
         <uni-icons type="compose" size="24" color="#2f65f9" />
       </view>
       <view class="intro-content">
-        <text class="text-lg font-bold text-primary">减脂问卷</text>
-        <text class="text-sm text-secondary" style="display:block;margin-top:6rpx;">用于生成个性化方案，请尽量如实填写</text>
+        <text class="text-lg font-bold text-primary">填写健康问卷</text>
+        <text class="text-sm text-secondary" style="display:block;margin-top:6rpx;">用于生成个性化减脂方案，请尽量如实填写</text>
       </view>
     </view>
 

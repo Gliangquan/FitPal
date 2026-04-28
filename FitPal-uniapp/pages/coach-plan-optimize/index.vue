@@ -1,7 +1,7 @@
 <template>
   <view class="page-content coach-plan-page">
     <view class="hero-section">
-      <text class="text-lg font-bold text-primary">方案优化</text>
+      <text class="text-lg font-bold text-primary">减脂方案优化</text>
       <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">
         教练可基于系统方案进行二次优化并保存
       </text>
@@ -92,6 +92,7 @@
 
 <script>
 import { fitApi } from '@/utils/api.js';
+import { ensureRoleAccess } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -123,6 +124,7 @@ export default {
     this.queryUserId = userId > 0 ? userId : '';
   },
   onShow() {
+    if (!ensureRoleAccess(['coach', 'admin'])) return;
     this.reload();
   },
   onReachBottom() {

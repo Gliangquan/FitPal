@@ -1,7 +1,7 @@
 <template>
   <view class="page-content membership-page">
     <view class="hero-section membership-hero">
-      <text class="text-lg font-bold text-primary">付费会员</text>
+      <text class="text-lg font-bold text-primary">会员服务</text>
       <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">
         当前版本暂未接入真实支付，这里先展示论文描述中的会员权益与后续开通入口。
       </text>

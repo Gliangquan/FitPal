@@ -29,7 +29,7 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/admin/users',
+    redirect: '/admin/profile',
   },
   {
     path: '/admin',
@@ -81,13 +81,13 @@ const routes = [
       },
       {
         path: '',
-        redirect: '/admin/users',
+        redirect: '/admin/profile',
       },
     ],
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/admin/users',
+    redirect: '/admin/profile',
   },
 ];
 

@@ -1,0 +1,19 @@
+@startuml 在线咨询回复模块流程图
+' 图4-16 在线咨询回复模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入教练工作台;
+:选择待回复咨询;
+:查看详情，填写回复内容;
+:选择是否推荐方案;
+:提交回复;
+:保存回复，通知用户;
+stop
+
+@enduml

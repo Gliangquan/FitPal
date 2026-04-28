@@ -1378,6 +1378,128 @@ def fit_my_coach_reviews():
         return success(result)
 
 
+@api.get("/fit/coach/reviews/received")
+@coach_or_admin_required
+def fit_coach_received_reviews():
+    login_user = g.login_user
+    coach_user_id = int(login_user["id"])
+    if login_user.get("user_role") == "admin":
+        coach_user_id = request.args.get("coachUserId", type=int) or coach_user_id
+
+    with engine.connect() as conn:
+        rows = query_all(
+            """
+            SELECT * FROM coach_review
+            WHERE coach_user_id = :uid AND is_delete = 0
+            ORDER BY create_time DESC
+            """,
+            {"uid": coach_user_id},
+            conn,
+        )
+        result = []
+        ratings: List[int] = []
+        for item in rows:
+            user = query_one("SELECT * FROM user WHERE id = :id LIMIT 1", {"id": item.get("user_id")}, conn)
+            rating_value = int(item.get("rating") or 0)
+            if rating_value > 0:
+                ratings.append(rating_value)
+            result.append(
+                {
+                    "id": item.get("id"),
+                    "userId": item.get("user_id"),
+                    "userName": safe_user_name(user, item.get("user_id")),
+                    "rating": item.get("rating"),
+                    "content": item.get("content"),
+                    "createTime": item.get("create_time"),
+                }
+            )
+        avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else 0
+        return success({"avgRating": avg_rating, "records": result})
+
+
+@api.get("/fit/coach/users-data")
+@coach_or_admin_required
+def fit_coach_user_data_list():
+    login_user = g.login_user
+    coach_user_id = int(login_user["id"])
+    if login_user.get("user_role") == "admin":
+        coach_user_id = request.args.get("coachUserId", type=int) or coach_user_id
+
+    with engine.connect() as conn:
+        user_rows = query_all(
+            """
+            SELECT DISTINCT user_id FROM coach_consultation
+            WHERE coach_user_id = :uid AND is_delete = 0
+            ORDER BY user_id DESC
+            """,
+            {"uid": coach_user_id},
+            conn,
+        )
+        result = []
+        for item in user_rows:
+            user_id = int(item.get("user_id") or 0)
+            if user_id <= 0:
+                continue
+            user = query_one("SELECT * FROM user WHERE id = :id LIMIT 1", {"id": user_id}, conn)
+            latest_record = query_one(
+                """
+                SELECT * FROM health_record
+                WHERE user_id = :uid AND is_delete = 0
+                ORDER BY record_date DESC, id DESC
+                LIMIT 1
+                """,
+                {"uid": user_id},
+                conn,
+            )
+            record_count_row = query_one(
+                "SELECT COUNT(1) AS cnt FROM health_record WHERE user_id = :uid AND is_delete = 0",
+                {"uid": user_id},
+                conn,
+            )
+            latest_questionnaire = query_one(
+                """
+                SELECT * FROM user_questionnaire
+                WHERE user_id = :uid AND is_delete = 0
+                ORDER BY create_time DESC, id DESC
+                LIMIT 1
+                """,
+                {"uid": user_id},
+                conn,
+            )
+            latest_plan = query_one(
+                """
+                SELECT * FROM personalized_plan
+                WHERE user_id = :uid AND is_delete = 0
+                ORDER BY create_time DESC, id DESC
+                LIMIT 1
+                """,
+                {"uid": user_id},
+                conn,
+            )
+            consultation_count_row = query_one(
+                "SELECT COUNT(1) AS cnt FROM coach_consultation WHERE coach_user_id = :coach_uid AND user_id = :uid AND is_delete = 0",
+                {"coach_uid": coach_user_id, "uid": user_id},
+                conn,
+            )
+            result.append(
+                {
+                    "userId": user_id,
+                    "userName": safe_user_name(user, user_id),
+                    "recordCount": int((record_count_row or {}).get("cnt", 0)),
+                    "latestWeightKg": latest_record.get("weight_kg") if latest_record else None,
+                    "latestRecordDate": latest_record.get("record_date") if latest_record else None,
+                    "currentWeightKg": latest_questionnaire.get("current_weight_kg") if latest_questionnaire else None,
+                    "targetWeightKg": latest_questionnaire.get("target_weight_kg") if latest_questionnaire else None,
+                    "questionnaireTime": latest_questionnaire.get("create_time") if latest_questionnaire else None,
+                    "latestPlanTime": latest_plan.get("create_time") if latest_plan else None,
+                    "latestPlanCalories": latest_plan.get("daily_calorie_target") if latest_plan else None,
+                    "latestPlanSource": latest_plan.get("source") if latest_plan else None,
+                    "consultationCount": int((consultation_count_row or {}).get("cnt", 0)),
+                }
+            )
+        return success(result)
+
+
 @api.post("/fit/coach/consultation/create")
 @login_required
 def fit_create_consultation():

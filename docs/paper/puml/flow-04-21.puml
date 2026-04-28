@@ -1,0 +1,19 @@
+@startuml 用户账号管理模块流程图
+' 图4-21 用户账号管理模块流程图（管理员）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入用户管理页面;
+:查询/筛选目标用户;
+:选择用户和操作类型;
+:填写原因并确认;
+:执行操作，记录日志;
+:返回操作结果;
+stop
+
+@enduml

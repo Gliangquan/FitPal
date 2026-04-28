@@ -1,0 +1,23 @@
+@startuml 社区内容审核模块流程图
+' 图4-22 社区内容审核模块流程图（管理员）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入内容审核页面;
+:查看待审核/举报内容;
+:选择内容查看详情;
+if (审核结果?) then (通过)
+  :通过内容;
+else (隐藏/删除)
+  :填写处理原因，更新状态;
+  :记录违规次数;
+endif
+:发送系统消息;
+stop
+
+@enduml

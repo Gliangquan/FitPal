@@ -1,5 +1,5 @@
 <template>
-  <a-card title="用户管理" :bordered="false">
+  <a-card title="用户账号管理" :bordered="false">
     <a-space style="margin-bottom: 12px" wrap>
       <a-input v-model:value="query.userName" placeholder="昵称" allow-clear style="width: 180px" />
       <a-select v-model:value="query.userRole" placeholder="角色" allow-clear style="width: 140px">

@@ -1,0 +1,21 @@
+@startuml 查看用户数据模块流程图
+' 图4-14 查看用户数据模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入教练工作台;
+:选择服务的用户;
+:点击查看用户数据;
+if (存在服务关系?) then (是)
+  :查询并展示用户完整数据;
+else (否)
+  :提示未建立服务关系;
+endif
+stop
+
+@enduml

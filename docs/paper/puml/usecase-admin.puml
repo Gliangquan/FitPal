@@ -1,0 +1,22 @@
+@startuml 管理员用例图
+' 图3-3 管理员用例图（与用例描述表3.18~3.22一一对应）
+
+left to right direction
+
+actor "管理员" as admin
+
+rectangle "轻体云管家后台管理系统" {
+    usecase "后台登录" as UC18
+    usecase "审核教练资质" as UC19
+    usecase "用户账号管理" as UC20
+    usecase "社区内容审核" as UC21
+    usecase "数据统计" as UC22
+}
+
+admin -- UC18
+admin -- UC19
+admin -- UC20
+admin -- UC21
+admin -- UC22
+
+@enduml

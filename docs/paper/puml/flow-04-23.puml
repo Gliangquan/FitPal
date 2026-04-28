@@ -1,0 +1,21 @@
+@startuml 数据统计模块流程图
+' 图4-23 数据统计模块流程图（管理员）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入数据统计页面;
+:选择日期范围和统计维度;
+:点击查询;
+if (数据量正常?) then (是)
+  :展示统计报表和图表;
+else (否)
+  :提示缩小查询范围;
+endif
+stop
+
+@enduml

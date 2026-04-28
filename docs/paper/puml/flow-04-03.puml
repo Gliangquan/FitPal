@@ -1,0 +1,21 @@
+@startuml 健康数据记录模块流程图
+' 图4-3 健康数据记录模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入健康记录页面;
+:选择日期，填写健康指标;
+:点击保存;
+if (数据校验通过?) then (是)
+  :保存记录，触发积分奖励;
+else (否)
+  :提示数据格式错误;
+endif
+stop
+
+@enduml

@@ -1,0 +1,21 @@
+@startuml 个人信息管理模块流程图
+' 图4-11 个人信息管理模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入个人中心;
+:修改头像、昵称、性别等信息;
+:点击保存;
+if (格式校验通过?) then (是)
+  :更新用户信息;
+else (否)
+  :提示格式错误;
+endif
+stop
+
+@enduml

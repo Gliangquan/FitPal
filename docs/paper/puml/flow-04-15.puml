@@ -1,0 +1,19 @@
+@startuml 减脂方案优化模块流程图
+' 图4-15 减脂方案优化模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:查看用户基础方案;
+:分析健康数据，点击优化;
+:修改饮食和运动建议;
+:填写调整说明，设置生效日期;
+:提交优化方案;
+:保存方案，通知用户;
+stop
+
+@enduml

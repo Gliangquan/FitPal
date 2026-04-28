@@ -1,7 +1,7 @@
 <template>
   <view class="page-content cert-page">
     <view class="hero-section">
-      <text class="text-lg font-bold text-primary">教练认证</text>
+      <text class="text-lg font-bold text-primary">教练资质认证</text>
       <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">
         {{ statusDesc }}
       </text>
@@ -41,8 +41,8 @@
         <button class="btn-primary-action" @tap="startEdit">重新提交</button>
       </view>
       <view class="actions approved-actions" v-if="profile.status === 'approved'">
-        <button class="btn-primary-action" @tap="goCoachWorkbench">教练工作台</button>
-        <button class="btn-secondary-action" @tap="goCoachPlanOptimize">方案优化</button>
+        <button class="btn-primary-action" @tap="goCoachWorkbench">在线咨询回复</button>
+        <button class="btn-secondary-action" @tap="goCoachPlanOptimize">减脂方案优化</button>
       </view>
     </view>
 
@@ -82,6 +82,7 @@
 
 <script>
 import { fitApi } from '@/utils/api.js';
+import { ensureRoleAccess } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -116,6 +117,7 @@ export default {
     }
   },
   onShow() {
+    if (!ensureRoleAccess(['coach', 'admin', 'user'])) return;
     this.loadProfile();
   },
   methods: {

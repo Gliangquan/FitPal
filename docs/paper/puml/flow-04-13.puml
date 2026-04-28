@@ -1,0 +1,23 @@
+@startuml 教练资质认证模块流程图
+' 图4-13 教练资质认证模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入认证页面;
+:填写姓名、证书信息、
+擅长领域、从业年限;
+:上传证书照片，填写简介;
+:提交认证申请;
+if (资料完整?) then (是)
+  :保存认证信息，通知管理员;
+else (否)
+  :提示资料不完整;
+endif
+stop
+
+@enduml

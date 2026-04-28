@@ -285,6 +285,18 @@ const fitApi = {
       method: 'GET'
     });
   },
+  getCoachReceivedReviews() {
+    return request({
+      url: '/fit/coach/reviews/received',
+      method: 'GET'
+    });
+  },
+  getCoachUsersData() {
+    return request({
+      url: '/fit/coach/users-data',
+      method: 'GET'
+    });
+  },
   getCommunityPost(id) {
     return request({
       url: `/fit/community/post/${id}`,

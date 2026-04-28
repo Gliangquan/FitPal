@@ -1,0 +1,22 @@
+@startuml 会员定制服务模块流程图
+' 图4-17 会员定制服务模块流程图（教练）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:查看会员列表;
+:选择会员用户;
+:查看健康数据和问卷信息;
+if (用户为会员?) then (是)
+  :制定定制方案，提交服务;
+  :保存方案，通知用户;
+else (否)
+  :提示未开通会员;
+endif
+stop
+
+@enduml

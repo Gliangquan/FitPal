@@ -1,0 +1,26 @@
+@startuml 专业教练用例图
+' 图3-2 专业教练用例图（与用例描述表3.11~3.17一一对应）
+
+left to right direction
+
+actor "专业教练" as coach
+
+rectangle "轻体云管家微信小程序" {
+    usecase "登录注册" as UC11
+    usecase "教练资质认证" as UC12
+    usecase "查看用户数据" as UC13
+    usecase "减脂方案优化" as UC14
+    usecase "在线咨询回复" as UC15
+    usecase "会员定制服务" as UC16
+    usecase "查看服务评价" as UC17
+}
+
+coach -- UC11
+coach -- UC12
+coach -- UC13
+coach -- UC14
+coach -- UC15
+coach -- UC16
+coach -- UC17
+
+@enduml

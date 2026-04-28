@@ -1,0 +1,21 @@
+@startuml 后台登录模块流程图
+' 图4-19 后台登录模块流程图（管理员）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:访问后台登录页;
+:输入账号、密码、验证码;
+:点击登录;
+if (验证码、账号、权限均正确?) then (是)
+  :记录日志，跳转首页;
+else (否)
+  :提示错误信息;
+endif
+stop
+
+@enduml

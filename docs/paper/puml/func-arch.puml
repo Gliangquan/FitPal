@@ -1,0 +1,57 @@
+@startwbs 系统功能结构图
+' 图4-1 系统功能结构图
+
+<style>
+wbsDiagram {
+    Linecolor black
+    arrow {
+        Linecolor black
+    }
+    :depth(0) {
+        BackgroundColor white
+        FontSize 14
+        FontStyle bold
+        RoundCorner 0
+    }
+    :depth(1) {
+        BackgroundColor white
+        FontSize 13
+        FontStyle bold
+        RoundCorner 0
+    }
+    :depth(2) {
+        BackgroundColor white
+        FontSize 12
+        RoundCorner 0
+    }
+}
+</style>
+
+* 基于微信小程序轻体云管家\n的设计与实现
+** 用户
+*** 登录注册
+*** 健康数据记录
+*** 填写健康问卷
+*** 个性化减脂方案
+*** 在线咨询
+*** 积分兑换
+*** 社区互动
+*** 会员服务
+*** 教练服务评价
+*** 个人信息管理
+** 专业教练
+*** 登录注册
+*** 教练资质认证
+*** 查看用户数据
+*** 减脂方案优化
+*** 在线咨询回复
+*** 会员定制服务
+*** 查看服务评价
+** 管理员
+*** 后台登录
+*** 审核教练资质
+*** 用户账号管理
+*** 社区内容审核
+*** 数据统计
+
+@endwbs

@@ -21,7 +21,7 @@
       <text class="avatar-hint">点击更换头像</text>
     </view>
 
-    <!-- 信息表单卡片（基本信息 + 地址信息合并） -->
+    <!-- 个人信息管理 -->
     <view class="form-card">
 
       <!-- 昵称 -->

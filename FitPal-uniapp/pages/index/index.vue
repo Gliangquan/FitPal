@@ -87,6 +87,7 @@
 
 <script>
 import { fitApi, userApi } from '@/utils/api.js';
+import { getFeatureList, navigateByFeature } from '@/utils/permissions.js';
 
 export default {
   data() {
@@ -101,14 +102,7 @@ export default {
       latestPlan: null,
       seasonTopic: null,
       communityPosts: [],
-      quickActions: [
-        { title: '健康记录', icon: '/static/icon_fit/zhenduanjilu.png', action: () => this.goFitHealth() },
-        { title: '减脂问卷', icon: '/static/icon_fit/xunwen.png', action: () => this.goFitQuestionnaire() },
-        { title: '个性化方案', icon: '/static/icon_fit/geixnghua.png', action: () => this.goFitPlan() },
-        { title: '轻体社区', icon: '/static/icon_fit/xiaoxi.png', action: () => this.goFitCommunity() },
-        { title: '任务勋章', icon: '/static/icon_fit/jiangbei.png', action: () => this.goTaskBadges() },
-        { title: '付费会员', icon: '/static/icon_fit/youhuika.png', action: () => this.goMembership() }
-      ]
+      quickActions: []
     };
   },
   computed: {
@@ -138,6 +132,22 @@ export default {
       } catch (error) {
         console.warn('获取用户信息失败', error);
       }
+      this.buildQuickActions();
+    },
+    buildQuickActions() {
+      const features = getFeatureList('user', [
+        'healthDataRecord',
+        'healthQuestionnaire',
+        'personalizedFatLossPlan',
+        'communityInteraction',
+        'pointsExchange',
+        'membershipService'
+      ]);
+      this.quickActions = features.map((item) => ({
+        title: item.label,
+        icon: item.icon,
+        action: () => this.goFeature(item.key)
+      }));
     },
     async loadDashboard() {
       try {
@@ -185,29 +195,23 @@ export default {
     goCheckinCalendar() {
       uni.navigateTo({ url: '/pages/checkin-calendar/index' });
     },
-    goFitHealth() {
-      uni.navigateTo({ url: '/pages/fit/health' });
+    goFeature(featureKey) {
+      navigateByFeature(featureKey);
     },
-    goFitQuestionnaire() {
-      uni.navigateTo({ url: '/pages/fit/questionnaire' });
+    goFitHealth() {
+      this.goFeature('healthDataRecord');
     },
     goFitPlan() {
-      uni.navigateTo({ url: '/pages/fit/plan' });
+      this.goFeature('personalizedFatLossPlan');
+    },
+    goFitCommunity() {
+      this.goFeature('communityInteraction');
     },
     goSeasonColumn() {
       uni.navigateTo({ url: '/pages/content-recommend/index?mode=season' });
     },
-    goFitCommunity() {
-      uni.switchTab({ url: '/pages/fit/community' });
-    },
     goProfile() {
       uni.switchTab({ url: '/pages/profile/index' });
-    },
-    goTaskBadges() {
-      uni.navigateTo({ url: '/pages/task-badge-list/index' });
-    },
-    goMembership() {
-      uni.navigateTo({ url: '/pages/membership/index' });
     },
     goSettings() {
       uni.navigateTo({ url: '/pages/settings/index' });

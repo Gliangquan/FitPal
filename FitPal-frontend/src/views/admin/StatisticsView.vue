@@ -17,7 +17,7 @@
 
     <a-row :gutter="16">
       <a-col :xs="24" :lg="12">
-        <a-card title="用户增长趋势" :bordered="false" :loading="chartsLoading">
+        <a-card title="用户账号统计趋势" :bordered="false" :loading="chartsLoading">
           <div id="userGrowthChart" style="height: 300px"></div>
         </a-card>
       </a-col>
@@ -43,7 +43,7 @@
 
     <a-card title="详细数据" :bordered="false" style="margin-top: 20px">
       <a-tabs>
-        <a-tab-pane key="1" tab="用户统计">
+        <a-tab-pane key="1" tab="用户账号统计">
           <a-table
             :columns="userColumns"
             :data-source="userStats"
@@ -61,7 +61,7 @@
             rowKey="id"
           />
         </a-tab-pane>
-        <a-tab-pane key="3" tab="教练统计">
+        <a-tab-pane key="3" tab="教练资质统计">
           <a-table
             :columns="coachColumns"
             :data-source="coachStats"

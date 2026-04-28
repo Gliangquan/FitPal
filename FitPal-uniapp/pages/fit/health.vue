@@ -1,7 +1,7 @@
 <template>
   <view class="page-content health-page">
     <view class="hero-section summary-card" v-if="summary">
-      <text class="text-lg font-bold text-primary">健康数据概览</text>
+      <text class="text-lg font-bold text-primary">健康数据记录</text>
       <view class="summary-grid">
         <view class="summary-item">
           <text class="text-sm text-muted">记录天数</text>

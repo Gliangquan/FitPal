@@ -1,7 +1,7 @@
 <template>
   <view class="page-content badges-page">
     <view class="hero-section">
-      <text class="text-lg font-bold text-primary">任务勋章</text>
+      <text class="text-lg font-bold text-primary">积分兑换</text>
       <text class="text-sm text-secondary" style="display:block;margin-top:6rpx;">
         当前可用积分：{{ availablePoint }}
       </text>

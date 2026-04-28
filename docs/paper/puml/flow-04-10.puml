@@ -1,0 +1,21 @@
+@startuml 教练服务评价模块流程图
+' 图4-10 教练服务评价模块流程图（用户）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入评价页面;
+:选择咨询，填写评分和内容;
+:选择是否匿名并提交;
+if (校验通过?) then (是)
+  :保存评价，更新教练评分;
+else (否)
+  :提示错误信息;
+endif
+stop
+
+@enduml

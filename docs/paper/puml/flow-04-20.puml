@@ -1,0 +1,22 @@
+@startuml 审核教练资质模块流程图
+' 图4-20 审核教练资质模块流程图（管理员）
+
+skinparam ActivityBackgroundColor white
+skinparam ActivityBorderColor black
+skinparam ArrowColor black
+skinparam DiamondBackgroundColor white
+skinparam DiamondBorderColor black
+
+start
+:进入教练审核页面;
+:查看待审核列表;
+:选择申请，查看认证资料;
+if (审核结果?) then (通过)
+  :通过审核，更新角色;
+else (驳回)
+  :填写驳回原因;
+endif
+:通知教练审核结果;
+stop
+
+@enduml

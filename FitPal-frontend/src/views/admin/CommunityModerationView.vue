@@ -1,5 +1,5 @@
 <template>
-  <a-card title="社区审核" :bordered="false">
+  <a-card title="社区内容审核" :bordered="false">
     <a-space style="margin-bottom: 12px" wrap>
       <a-select v-model:value="query.status" allow-clear placeholder="状态" style="width: 160px">
         <a-select-option value="published">已发布</a-select-option>

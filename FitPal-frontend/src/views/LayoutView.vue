@@ -1,7 +1,7 @@
 <template>
   <a-layout class="layout-root">
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible class="sider">
-      <div class="brand" @click="go('/admin/users')">
+      <div class="brand" @click="go('/admin/profile')">
         <div class="brand-dot" />
         <span v-if="!collapsed">FitPal Admin</span>
       </div>
@@ -85,24 +85,34 @@ const headerAvatar = computed(() => resolveFilePreviewUrl(currentUser.value?.use
 
 const menuItems = computed(() => [
   {
-    key: '/admin/users',
-    icon: () => h(UserOutlined),
-    label: '用户管理',
+    key: '/admin/profile',
+    icon: () => h(IdcardOutlined),
+    label: '后台登录',
   },
   {
     key: '/admin/coach-applications',
     icon: () => h(AuditOutlined),
-    label: '教练审核',
+    label: '审核教练资质',
+  },
+  {
+    key: '/admin/users',
+    icon: () => h(UserOutlined),
+    label: '用户账号管理',
+  },
+  {
+    key: '/admin/community-moderation',
+    icon: () => h(MessageOutlined),
+    label: '社区内容审核',
+  },
+  {
+    key: '/admin/statistics',
+    icon: () => h(BarChartOutlined),
+    label: '数据统计',
   },
   {
     key: '/admin/content-review',
     icon: () => h(FileSearchOutlined),
     label: '内容审核',
-  },
-  {
-    key: '/admin/community-moderation',
-    icon: () => h(MessageOutlined),
-    label: '社区审核',
   },
   {
     key: '/admin/plans',
@@ -125,19 +135,9 @@ const menuItems = computed(() => [
     label: '积分管理',
   },
   {
-    key: '/admin/statistics',
-    icon: () => h(BarChartOutlined),
-    label: '数据统计',
-  },
-  {
     key: '/admin/settings',
     icon: () => h(SettingOutlined),
     label: '系统设置',
-  },
-  {
-    key: '/admin/profile',
-    icon: () => h(IdcardOutlined),
-    label: '个人中心',
   },
 ]);
 

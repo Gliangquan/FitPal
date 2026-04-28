@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <a-card class="login-card" :bordered="false">
-      <h2>FitPal PC 登录</h2>
+      <h2>后台登录</h2>
       <p class="sub">   </p>
 
       <a-segmented
@@ -83,12 +83,12 @@ const handleLogin = async () => {
   try {
     const res = await userLogin(params);
     if (res.data?.userRole !== 'admin') {
-      message.error('PC 端仅支持管理员账号登录');
+      message.error('仅允许管理员进行后台登录');
       return;
     }
     localStorage.setItem('user', JSON.stringify(res.data));
     message.success('登录成功');
-    router.replace('/admin/users');
+    router.replace('/admin/profile');
   } catch (error: any) {
     message.error(error?.message || '登录失败');
   } finally {

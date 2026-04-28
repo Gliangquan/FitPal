@@ -1,0 +1,11 @@
+摘要：体重管理已成为国家战略，2025年“体重管理年”提出构建数字化体重管理体系，但我国超重肥胖问题突出，减脂市场乱象丛生，现有健康管理工具存在功能单一、个性化不足、政策适配性低等问题。本研究以开发贴合政策导向、适配国人需求的轻量化减脂管理工具为目标，打造轻体云管家微信小程序。系统采用分层架构设计，用户端集成健康数据记录、个性化方案生成、节气减脂专题、社区互动等核心功能模块，专业教练端提供个性化方案、在线咨询服务，管理员端实现对专业人士资质认证，用户管理，社区信息及反馈信息的全流程管理。技术上，采用MySQL搭建数据库，依托Python构建后端服务，选用uni-app构建移动前端界面。 
+经系统测试，性能完全满足设计预期。
+关键词：体重管理；uni-app；科学减脂；节气养生
+
+Design and Implementation of Light Body Cloud Manager Based on WeChat Mini Program
+Computer Science and Technology  Huayi Huang
+Supervisor  Nanchao Luo
+
+Abstract：Weight management has become a national strategy. The 2025 "National Weight Management Year" proposed the construction of a digital weight management system. However, China faces prominent problems of overweight and obesity, and the weight loss market is in disarray. Existing health management tools suffer from single functions, insufficient personalization, and low adaptability. To align with policy guidelines and meet domestic demands, this study develops the "Light Body Cloud Manager" WeChat Mini Program, a lightweight weight loss management tool. The system adopts a layered architecture: the user terminal integrates core modules such as health data recording, personalized plan generation, solar term weight loss topics, and community interaction; the professional coach terminal provides customized plans and online consulting services; the administrator terminal realizes the full-process management of professional qualification authentication, user management, community information, and feedback. Technically, MySQL is used for database construction, Python for back-end service development, and uni-app for the mobile front-end interface
+System testing shows that the performance fully meets the design expectations.
+Keywords：Weight Management; uni-app; Scientific Weight Loss; Solar Term Health Preservation

@@ -30,101 +30,26 @@
     </view>
 
     <view class="card menu-card">
-      <view class="menu-item" @tap="goMyCoach">
+      <view
+        class="menu-item"
+        v-for="(item, index) in capabilityMenus"
+        :key="item.key"
+        @tap="goCapability(item.key)"
+      >
         <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/yisheng.png" mode="aspectFit" /></view>
-          <text class="menu-title">我的教练</text>
+          <view class="menu-icon"><image class="menu-icon-img" :src="item.icon" mode="aspectFit" /></view>
+          <text class="menu-title">{{ item.label }}</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" v-if="user.userRole === 'coach'" @tap="goCoachCertification">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/xianhua.png" mode="aspectFit" /></view>
-          <text class="menu-title">教练资质</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" v-if="user.userRole === 'coach'" />
-
-      <view class="menu-item" v-if="user.userRole === 'coach'" @tap="goCoachWorkbench">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/redu.png" mode="aspectFit" /></view>
-          <text class="menu-title">教练工作台</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" v-if="user.userRole === 'coach'" />
-
-      <view class="menu-item" v-if="user.userRole === 'coach'" @tap="goCoachPlanOptimize">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/geixnghua.png" mode="aspectFit" /></view>
-          <text class="menu-title">方案优化</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" v-if="user.userRole === 'coach'" />
-
-      <view class="menu-item" @tap="goHealth">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/zhenduanjilu.png" mode="aspectFit" /></view>
-          <text class="menu-title">健康记录</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" @tap="goQuestionnaire">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/xunwen.png" mode="aspectFit" /></view>
-          <text class="menu-title">减脂问卷</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" @tap="goPlan">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/geixnghua.png" mode="aspectFit" /></view>
-          <text class="menu-title">个性化方案</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" @tap="goCommunity">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/xiaoxi.png" mode="aspectFit" /></view>
-          <text class="menu-title">轻体社区</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" @tap="goContentRecommend">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/redu.png" mode="aspectFit" /></view>
-          <text class="menu-title">内容推荐</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
-      <view class="menu-divider" />
-
-      <view class="menu-item" @tap="goPointBadges">
-        <view class="menu-left">
-          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/jiangbei.png" mode="aspectFit" /></view>
-          <text class="menu-title">勋章兑换</text>
-        </view>
-        <uni-icons type="forward" size="16" color="#94a3b8" />
-      </view>
+      <view class="menu-divider" v-for="(item, index) in capabilityMenus" :key="`${item.key}-divider`" v-if="index < capabilityMenus.length - 1" />
     </view>
 
     <view class="card menu-card">
       <view class="menu-item" @tap="goEdit">
         <view class="menu-left">
           <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/bianji.png" mode="aspectFit" /></view>
-          <text class="menu-title">编辑个人信息</text>
+          <text class="menu-title">个人信息管理</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
@@ -133,7 +58,7 @@
       <view class="menu-item" @tap="goChangePassword">
         <view class="menu-left">
           <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/yaoxiang.png" mode="aspectFit" /></view>
-          <text class="menu-title">修改密码</text>
+          <text class="menu-title">登录注册</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
@@ -142,7 +67,7 @@
       <view class="menu-item" @tap="goSettings">
         <view class="menu-left">
           <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/shezhi.png" mode="aspectFit" /></view>
-          <text class="menu-title">系统设置</text>
+          <text class="menu-title">设置</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
@@ -157,13 +82,15 @@
 <script>
 import { fitApi, userApi } from '@/utils/api.js';
 import { resolveFileUrl } from '@/utils/request.js';
+import { getCurrentRole, hasFeature, getFeatureList, navigateByFeature } from '@/utils/permissions.js';
 
 export default {
   data() {
     return {
       user: {},
       points: 0,
-      taskBadgeCount: 0
+      taskBadgeCount: 0,
+      capabilityMenus: []
     };
   },
   async onShow() {
@@ -182,6 +109,30 @@ export default {
       } catch (error) {
         this.user = uni.getStorageSync('userInfo') || {};
       }
+      this.buildCapabilityMenus();
+    },
+    buildCapabilityMenus() {
+      const role = getCurrentRole();
+      const featureKeys = role === 'coach'
+        ? [
+            'coachCertification',
+            'viewUserData',
+            'fatLossPlanOptimization',
+            'consultationReply',
+            'memberCustomService',
+            'viewServiceReviews'
+          ]
+        : [
+            'healthDataRecord',
+            'healthQuestionnaire',
+            'personalizedFatLossPlan',
+            'onlineConsultation',
+            'pointsExchange',
+            'communityInteraction',
+            'membershipService',
+            'coachServiceReview'
+          ];
+      this.capabilityMenus = getFeatureList(role, featureKeys);
     },
     async loadPoints() {
       try {
@@ -193,41 +144,20 @@ export default {
         this.taskBadgeCount = 0;
       }
     },
-    goHealth() {
-      uni.navigateTo({ url: '/pages/fit/health' });
-    },
-    goMyCoach() {
-      uni.navigateTo({ url: '/pages/my-coach/index' });
-    },
-    goCoachCertification() {
-      uni.navigateTo({ url: '/pages/coach-certification/index' });
-    },
-    goCoachWorkbench() {
-      uni.navigateTo({ url: '/pages/coach-workbench/index' });
-    },
-    goCoachPlanOptimize() {
-      uni.navigateTo({ url: '/pages/coach-plan-optimize/index' });
-    },
-    goQuestionnaire() {
-      uni.navigateTo({ url: '/pages/fit/questionnaire' });
-    },
-    goPlan() {
-      uni.navigateTo({ url: '/pages/fit/plan' });
-    },
-    goCommunity() {
-      uni.switchTab({ url: '/pages/fit/community' });
-    },
-    goContentRecommend() {
-      uni.navigateTo({ url: '/pages/content-recommend/index' });
-    },
-    goPointBadges() {
-      uni.navigateTo({ url: '/pages/points-badges/index' });
+    goCapability(featureKey) {
+      if (featureKey === 'coachServiceReview') {
+        uni.navigateTo({ url: '/pages/my-coach/index' });
+        return;
+      }
+      navigateByFeature(featureKey);
     },
     goEdit() {
       uni.navigateTo({ url: '/pages/edit-profile/index' });
     },
     goChangePassword() {
-      uni.navigateTo({ url: '/pages/change-password/index' });
+      if (hasFeature('loginRegister')) {
+        uni.navigateTo({ url: '/pages/change-password/index' });
+      }
     },
     goSettings() {
       uni.navigateTo({ url: '/pages/settings/index' });
