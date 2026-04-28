@@ -323,18 +323,144 @@ def update_my_user():
         "user_name": get_string(payload, "userName"),
         "user_avatar": get_string(payload, "userAvatar"),
         "user_profile": get_string(payload, "userProfile"),
+        "user_phone": get_string(payload, "userPhone"),
+        "user_email": get_string(payload, "userEmail"),
     }
     update_fields = {k: v for k, v in update_fields.items() if v is not None}
-    if not update_fields:
+    ext_fields = {
+        "gender": get_string(payload, "gender"),
+        "province": get_string(payload, "province"),
+        "city": get_string(payload, "city"),
+        "district": get_string(payload, "district"),
+        "address": get_string(payload, "address"),
+    }
+    if "birthDate" in payload:
+        ext_fields["birth_date"] = parse_date(get_string(payload, "birthDate"), "birthDate") if get_string(payload, "birthDate") else None
+    ext_fields = {k: v for k, v in ext_fields.items() if v is not None}
+    if not update_fields and not ext_fields:
         return success(True)
 
-    set_clause = ", ".join([f"{k} = :{k}" for k in update_fields.keys()])
-    params = {**update_fields, "id": g.login_user["id"]}
     with engine.begin() as conn:
-        result = execute_sql(f"UPDATE user SET {set_clause}, update_time = NOW() WHERE id = :id", params, conn)
-        if result.rowcount <= 0:
-            raise BusinessException(ERR_OPERATION, "操作失败")
+        current_id = int(g.login_user["id"])
+        if "user_phone" in update_fields:
+            phone_owner = query_one("SELECT id FROM user WHERE user_phone = :up LIMIT 1", {"up": update_fields["user_phone"]}, conn)
+            if phone_owner and int(phone_owner.get("id") or 0) != current_id:
+                raise BusinessException(ERR_PARAMS, "手机号已被占用")
+        if "user_email" in update_fields and update_fields["user_email"]:
+            email_owner = query_one("SELECT id FROM user WHERE user_email = :ue LIMIT 1", {"ue": update_fields["user_email"]}, conn)
+            if email_owner and int(email_owner.get("id") or 0) != current_id:
+                raise BusinessException(ERR_PARAMS, "邮箱已被占用")
+
+        if update_fields:
+            set_clause = ", ".join([f"{k} = :{k}" for k in update_fields.keys()])
+            params = {**update_fields, "id": current_id}
+            result = execute_sql(f"UPDATE user SET {set_clause}, update_time = NOW() WHERE id = :id", params, conn)
+            if result.rowcount <= 0:
+                raise BusinessException(ERR_OPERATION, "操作失败")
+
+        if ext_fields:
+            existing_ext = query_one("SELECT user_id FROM user_profile_ext WHERE user_id = :uid LIMIT 1", {"uid": current_id}, conn)
+            if existing_ext:
+                set_clause = ", ".join([f"{k} = :{k}" for k in ext_fields.keys()])
+                execute_sql(
+                    f"UPDATE user_profile_ext SET {set_clause}, update_time = NOW() WHERE user_id = :user_id",
+                    {**ext_fields, "user_id": current_id},
+                    conn,
+                )
+            else:
+                columns = ", ".join(["user_id", *ext_fields.keys()])
+                values = ", ".join([":user_id", *[f":{k}" for k in ext_fields.keys()]])
+                execute_sql(
+                    f"INSERT INTO user_profile_ext ({columns}) VALUES ({values})",
+                    {**ext_fields, "user_id": current_id},
+                    conn,
+                )
         return success(True)
+
+
+@api.post("/user/update/password")
+@login_required
+def update_my_password():
+    payload = request.get_json(silent=True) or {}
+    old_password = get_string(payload, "oldPassword")
+    new_password = get_string(payload, "newPassword")
+    if not old_password or not new_password:
+        raise BusinessException(ERR_PARAMS, "原密码和新密码不能为空")
+    if len(new_password) < 8:
+        raise BusinessException(ERR_PARAMS, "新密码长度至少 8 位")
+
+    current_id = int(g.login_user["id"])
+    old_encrypted = md5_password(old_password)
+    new_encrypted = md5_password(new_password)
+    with engine.begin() as conn:
+        user = query_one("SELECT * FROM user WHERE id = :id LIMIT 1", {"id": current_id}, conn)
+        if not user:
+            raise BusinessException(ERR_NOT_LOGIN, "未登录")
+        if str(user.get("user_password") or "") != old_encrypted:
+            raise BusinessException(ERR_INVALID_PASSWORD, "原密码错误")
+        execute_sql(
+            "UPDATE user SET user_password = :pwd, update_time = NOW() WHERE id = :id",
+            {"pwd": new_encrypted, "id": current_id},
+            conn,
+        )
+        return success(True)
+
+
+@api.post("/user/membership/activate")
+@login_required
+def activate_user_membership():
+    payload = request.get_json(silent=True) or {}
+    plan_code = get_string(payload, "planCode") or "month"
+    plan_mapping = {
+        "month": ("月度会员", 30),
+        "quarter": ("季度会员", 90),
+        "year": ("年度会员", 365),
+    }
+    if plan_code not in plan_mapping:
+        raise BusinessException(ERR_PARAMS, "会员套餐不存在")
+
+    plan_name, days = plan_mapping[plan_code]
+    current_id = int(g.login_user["id"])
+    now = datetime.now()
+    with engine.begin() as conn:
+        active = query_one(
+            "SELECT * FROM user_membership WHERE user_id = :uid AND status = 'active' AND end_time >= NOW() ORDER BY end_time DESC LIMIT 1",
+            {"uid": current_id},
+            conn,
+        )
+        start_time = active.get("end_time") if active and active.get("end_time") and active.get("end_time") > now else now
+        end_time = start_time + timedelta(days=days)
+        if active:
+            execute_sql(
+                "UPDATE user_membership SET plan_code = :plan_code, plan_name = :plan_name, start_time = :start_time, end_time = :end_time, source = 'app', update_time = NOW() WHERE id = :id",
+                {
+                    "plan_code": plan_code,
+                    "plan_name": plan_name,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "id": active.get("id"),
+                },
+                conn,
+            )
+        else:
+            execute_sql(
+                "INSERT INTO user_membership (user_id, plan_code, plan_name, start_time, end_time, status, source) VALUES (:uid, :plan_code, :plan_name, :start_time, :end_time, 'active', 'app')",
+                {
+                    "uid": current_id,
+                    "plan_code": plan_code,
+                    "plan_name": plan_name,
+                    "start_time": start_time,
+                    "end_time": end_time,
+                },
+                conn,
+            )
+        membership = get_active_membership(current_id, conn)
+        return success({
+            "membershipActive": bool(membership),
+            "membershipPlanCode": membership.get("plan_code"),
+            "membershipPlanName": membership.get("plan_name"),
+            "membershipEndTime": membership.get("end_time"),
+        })
 
 
 @api.post("/user/batch-delete")

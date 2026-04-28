@@ -25,24 +25,36 @@
     <view class="card membership-card">
       <text class="section-title">套餐说明</text>
       <view class="plan-list">
-        <view class="plan-item" v-for="item in plans" :key="item.name">
-          <view>
+        <view class="plan-item" v-for="item in plans" :key="item.code">
+          <view class="plan-main">
             <text class="plan-name">{{ item.name }}</text>
             <text class="plan-desc">{{ item.desc }}</text>
+            <text v-if="activePlanCode === item.code && membershipEndTime" class="plan-active-tip">
+              有效期至：{{ String(membershipEndTime).replace('T', ' ').slice(0, 16) }}
+            </text>
           </view>
-          <text class="plan-price">{{ item.price }}</text>
+          <view class="plan-side">
+            <text class="plan-price">{{ item.price }}</text>
+            <button class="btn-primary membership-btn" :disabled="isPlanDisabled(item)" @tap="activatePlan(item.code)">
+              {{ planButtonText(item) }}
+            </button>
+          </view>
         </view>
       </view>
-      <button class="btn-primary membership-btn" @tap="comingSoon">立即开通</button>
-      <text class="membership-tip">支付能力、会员订单、权益鉴权尚未接入，当前为占位版页面。</text>
+      <text class="membership-tip">当前为站内开通闭环，已接入会员状态持久化；支付订单能力暂未接入。</text>
     </view>
   </view>
 </template>
 
 <script>
+import { userApi } from '@/utils/api.js';
+
 export default {
   data() {
     return {
+      activating: false,
+      activePlanCode: '',
+      membershipEndTime: '',
       benefits: [
         {
           title: '专属减脂方案',
@@ -66,15 +78,48 @@ export default {
         }
       ],
       plans: [
-        { name: '月度会员', desc: '适合短期减脂冲刺', price: '¥29/月' },
-        { name: '季度会员', desc: '适合稳定执行计划', price: '¥79/季' },
-        { name: '年度会员', desc: '适合长期健康管理', price: '¥199/年' }
+        { code: 'month', name: '月度会员', desc: '适合短期减脂冲刺', price: '¥29/月' },
+        { code: 'quarter', name: '季度会员', desc: '适合稳定执行计划', price: '¥79/季' },
+        { code: 'year', name: '年度会员', desc: '适合长期健康管理', price: '¥199/年' }
       ]
     };
   },
+  onShow() {
+    this.loadMembership();
+  },
   methods: {
-    comingSoon() {
-      uni.showToast({ title: '支付会员功能暂未接入', icon: 'none' });
+    async loadMembership() {
+      try {
+        const user = await userApi.fetchCurrentUser();
+        this.activePlanCode = user?.membershipPlanCode || '';
+        this.membershipEndTime = user?.membershipEndTime || '';
+      } catch (error) {
+        this.activePlanCode = '';
+        this.membershipEndTime = '';
+      }
+    },
+    async activatePlan(planCode) {
+      if (this.activating) return;
+      this.activating = true;
+      try {
+        const data = await userApi.activateMembership({ planCode });
+        this.activePlanCode = data?.membershipPlanCode || planCode;
+        this.membershipEndTime = data?.membershipEndTime || '';
+        const refreshed = await userApi.fetchCurrentUser().catch(() => null);
+        if (refreshed) uni.setStorageSync('userInfo', refreshed);
+        uni.showToast({ title: '会员服务已开通', icon: 'success' });
+      } catch (error) {
+        uni.showToast({ title: error.message || '开通失败', icon: 'none' });
+      } finally {
+        this.activating = false;
+      }
+    },
+    planButtonText(item) {
+      if (this.activePlanCode === item.code) return '当前已开通';
+      return this.activating ? '开通中...' : '立即开通';
+    },
+    isPlanDisabled(item) {
+      return this.activating || this.activePlanCode === item.code;
     }
   }
 };
@@ -165,6 +210,20 @@ export default {
   background: #f6f9ff;
 }
 
+.plan-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-side {
+  width: 200rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12rpx;
+}
+
 .plan-name {
   display: block;
   font-size: 27rpx;
@@ -179,6 +238,13 @@ export default {
   color: $text-secondary;
 }
 
+.plan-active-tip {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: #2f65f9;
+}
+
 .plan-price {
   flex-shrink: 0;
   font-size: 28rpx;
@@ -188,7 +254,10 @@ export default {
 
 .membership-btn {
   width: 100%;
-  margin-top: 20rpx;
+  margin-top: 0;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 24rpx;
 }
 
 .membership-tip {

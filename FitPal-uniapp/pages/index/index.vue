@@ -126,8 +126,13 @@ export default {
       try {
         const fresh = await userApi.fetchCurrentUser();
         if (fresh) {
+          // 保留本地存储的 token，因为后端返回的用户对象不包含 token
+          const token = localUser.token;
           this.userInfo = fresh;
-          uni.setStorageSync('userInfo', fresh);
+          if (token) {
+            this.userInfo.token = token;
+          }
+          uni.setStorageSync('userInfo', this.userInfo);
         }
       } catch (error) {
         console.warn('获取用户信息失败', error);

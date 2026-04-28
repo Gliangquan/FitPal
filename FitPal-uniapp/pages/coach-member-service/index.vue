@@ -2,7 +2,7 @@
   <view class="page-content coach-member-page">
     <view class="hero-section">
       <text class="text-lg font-bold text-primary">会员定制服务</text>
-      <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">当前基于现有能力，为会员用户提供方案优化与咨询跟进入口</text>
+      <text class="text-sm text-secondary" style="display:block;margin-top:8rpx;">面向已开通会员服务的用户，提供方案优化与在线咨询回复闭环</text>
     </view>
 
     <view class="card service-card">

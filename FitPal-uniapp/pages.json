@@ -81,7 +81,7 @@
     {
       "path": "pages/change-password/index",
       "style": {
-        "navigationBarTitleText": "登录注册"
+        "navigationBarTitleText": "修改密码"
       }
     },
     {

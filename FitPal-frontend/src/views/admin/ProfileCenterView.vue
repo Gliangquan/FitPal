@@ -1,5 +1,12 @@
 <template>
   <a-card title="后台登录" :bordered="false">
+    <a-alert
+      type="info"
+      show-icon
+      message="当前为管理员后台登录信息页"
+      description="管理员登录成功后可继续进行审核教练资质、用户账号管理、社区内容审核和数据统计。"
+      style="margin-bottom: 16px"
+    />
     <a-row :gutter="24">
       <a-col :xs="24" :md="8" :lg="7">
         <div class="avatar-panel">

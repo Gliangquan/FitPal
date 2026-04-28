@@ -23,6 +23,26 @@ const ROLE_FEATURES = {
   admin: ['adminBackstageLogin']
 };
 
+const FEATURE_ALLOWED_ROLES = {
+  loginRegister: ['user', 'coach'],
+  healthDataRecord: ['user'],
+  healthQuestionnaire: ['user'],
+  personalizedFatLossPlan: ['user'],
+  onlineConsultation: ['user'],
+  pointsExchange: ['user'],
+  communityInteraction: ['user'],
+  membershipService: ['user'],
+  coachServiceReview: ['user'],
+  personalInfoManagement: ['user'],
+  coachCertification: ['coach'],
+  viewUserData: ['coach'],
+  fatLossPlanOptimization: ['coach'],
+  consultationReply: ['coach'],
+  memberCustomService: ['coach'],
+  viewServiceReviews: ['coach'],
+  adminBackstageLogin: ['admin']
+};
+
 const FEATURE_META = {
   healthDataRecord: {
     label: '健康数据记录',
@@ -112,7 +132,9 @@ function getCurrentRole() {
 }
 
 function hasFeature(featureKey, role = getCurrentRole()) {
-  return (ROLE_FEATURES[role] || []).includes(featureKey);
+  const features = ROLE_FEATURES[role] || [];
+  const allowedRoles = FEATURE_ALLOWED_ROLES[featureKey] || [];
+  return features.includes(featureKey) && allowedRoles.includes(role);
 }
 
 function getFeatureList(role = getCurrentRole(), keys = []) {
@@ -145,4 +167,4 @@ function ensureRoleAccess(allowedRoles = [], message = '暂无权限访问该功
   return false;
 }
 
-export { ROLE_FEATURES, FEATURE_META, getCurrentUser, getCurrentRole, hasFeature, getFeatureList, navigateByFeature, ensureRoleAccess };
+export { ROLE_FEATURES, FEATURE_ALLOWED_ROLES, FEATURE_META, getCurrentUser, getCurrentRole, hasFeature, getFeatureList, navigateByFeature, ensureRoleAccess };

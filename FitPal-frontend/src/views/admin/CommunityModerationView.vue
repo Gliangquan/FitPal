@@ -52,7 +52,7 @@
         </template>
         <template v-if="column.key === 'action'">
           <a-space>
-            <a-button size="small" @click="review(record, 'publish')">发布</a-button>
+            <a-button size="small" @click="review(record, 'publish')">通过</a-button>
             <a-button size="small" @click="review(record, 'hide')">隐藏</a-button>
             <a-button size="small" danger @click="review(record, 'reject')">驳回</a-button>
           </a-space>

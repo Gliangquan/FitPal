@@ -55,10 +55,19 @@
       </view>
       <view class="menu-divider" />
 
-      <view class="menu-item" @tap="goChangePassword">
+      <view class="menu-item" @tap="goLoginRegister">
         <view class="menu-left">
           <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/yaoxiang.png" mode="aspectFit" /></view>
           <text class="menu-title">登录注册</text>
+        </view>
+        <uni-icons type="forward" size="16" color="#94a3b8" />
+      </view>
+      <view class="menu-divider" />
+
+      <view class="menu-item" @tap="goChangePassword">
+        <view class="menu-left">
+          <view class="menu-icon"><image class="menu-icon-img" src="/static/icon_fit/yaoxiang.png" mode="aspectFit" /></view>
+          <text class="menu-title">修改密码</text>
         </view>
         <uni-icons type="forward" size="16" color="#94a3b8" />
       </view>
@@ -103,9 +112,17 @@ export default {
     },
     async loadUser() {
       try {
+        const localUser = uni.getStorageSync('userInfo') || {};
         const user = await userApi.fetchCurrentUser();
         this.user = user || {};
-        if (user) uni.setStorageSync('userInfo', user);
+        if (user) {
+          // 保留本地存储的 token，因为后端返回的用户对象不包含 token
+          const token = localUser.token;
+          if (token) {
+            user.token = token;
+          }
+          uni.setStorageSync('userInfo', user);
+        }
       } catch (error) {
         this.user = uni.getStorageSync('userInfo') || {};
       }
@@ -115,6 +132,7 @@ export default {
       const role = getCurrentRole();
       const featureKeys = role === 'coach'
         ? [
+            'loginRegister',
             'coachCertification',
             'viewUserData',
             'fatLossPlanOptimization',
@@ -123,6 +141,7 @@ export default {
             'viewServiceReviews'
           ]
         : [
+            'loginRegister',
             'healthDataRecord',
             'healthQuestionnaire',
             'personalizedFatLossPlan',
@@ -130,9 +149,10 @@ export default {
             'pointsExchange',
             'communityInteraction',
             'membershipService',
-            'coachServiceReview'
+            'coachServiceReview',
+            'personalInfoManagement'
           ];
-      this.capabilityMenus = getFeatureList(role, featureKeys);
+      this.capabilityMenus = getFeatureList(role, featureKeys).filter((item) => item.key !== 'loginRegister' && item.key !== 'personalInfoManagement');
     },
     async loadPoints() {
       try {
@@ -154,10 +174,13 @@ export default {
     goEdit() {
       uni.navigateTo({ url: '/pages/edit-profile/index' });
     },
-    goChangePassword() {
+    goLoginRegister() {
       if (hasFeature('loginRegister')) {
-        uni.navigateTo({ url: '/pages/change-password/index' });
+        uni.reLaunch({ url: '/pages/login/index' });
       }
+    },
+    goChangePassword() {
+      uni.navigateTo({ url: '/pages/change-password/index' });
     },
     goSettings() {
       uni.navigateTo({ url: '/pages/settings/index' });

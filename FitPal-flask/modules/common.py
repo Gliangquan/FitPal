@@ -880,6 +880,41 @@ def init_runtime_tables() -> None:
                 """,
                 conn=conn,
             )
+            execute_sql(
+                """
+                CREATE TABLE IF NOT EXISTS user_profile_ext (
+                    user_id BIGINT NOT NULL PRIMARY KEY,
+                    gender VARCHAR(16) NULL,
+                    birth_date DATE NULL,
+                    province VARCHAR(64) NULL,
+                    city VARCHAR(64) NULL,
+                    district VARCHAR(64) NULL,
+                    address VARCHAR(255) NULL,
+                    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                """,
+                conn=conn,
+            )
+            execute_sql(
+                """
+                CREATE TABLE IF NOT EXISTS user_membership (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    user_id BIGINT NOT NULL,
+                    plan_code VARCHAR(32) NOT NULL,
+                    plan_name VARCHAR(64) NOT NULL,
+                    start_time DATETIME NOT NULL,
+                    end_time DATETIME NOT NULL,
+                    status VARCHAR(16) NOT NULL DEFAULT 'active',
+                    source VARCHAR(32) NOT NULL DEFAULT 'demo',
+                    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    KEY idx_membership_user (user_id),
+                    KEY idx_membership_status_end (status, end_time)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                """,
+                conn=conn,
+            )
     except Exception as exc:
         logger.warning("init runtime tables failed: %s", exc)
 
@@ -1080,13 +1115,62 @@ def user_vo(user: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def get_user_profile_ext(user_id: int, conn: Optional[Connection] = None) -> Dict[str, Any]:
+    own_conn = conn is None
+    local_conn = conn or engine.connect()
+    try:
+        row = query_one(
+            "SELECT * FROM user_profile_ext WHERE user_id = :uid LIMIT 1",
+            {"uid": int(user_id)},
+            local_conn,
+        )
+        return row or {}
+    finally:
+        if own_conn:
+            local_conn.close()
+
+
+def get_active_membership(user_id: int, conn: Optional[Connection] = None) -> Dict[str, Any]:
+    own_conn = conn is None
+    local_conn = conn or engine.connect()
+    try:
+        row = query_one(
+            """
+            SELECT * FROM user_membership
+            WHERE user_id = :uid AND status = 'active' AND end_time >= NOW()
+            ORDER BY end_time DESC, id DESC
+            LIMIT 1
+            """,
+            {"uid": int(user_id)},
+            local_conn,
+        )
+        return row or {}
+    finally:
+        if own_conn:
+            local_conn.close()
+
+
 def login_user_vo(user: Dict[str, Any], token: Optional[str] = None, is_new_user: Optional[bool] = None) -> Dict[str, Any]:
+    ext = get_user_profile_ext(int(user.get("id") or 0)) if user.get("id") else {}
+    membership = get_active_membership(int(user.get("id") or 0)) if user.get("id") else {}
     result = {
         "id": user.get("id"),
         "userAccount": user.get("user_account"),
         "userName": user.get("user_name"),
         "userAvatar": user.get("user_avatar"),
         "userProfile": user.get("user_profile"),
+        "userPhone": user.get("user_phone"),
+        "userEmail": user.get("user_email"),
+        "gender": ext.get("gender"),
+        "birthDate": ext.get("birth_date"),
+        "province": ext.get("province"),
+        "city": ext.get("city"),
+        "district": ext.get("district"),
+        "address": ext.get("address"),
+        "membershipActive": bool(membership),
+        "membershipPlanCode": membership.get("plan_code"),
+        "membershipPlanName": membership.get("plan_name"),
+        "membershipEndTime": membership.get("end_time"),
         "userRole": user.get("user_role"),
         "createTime": user.get("create_time"),
         "updateTime": user.get("update_time"),

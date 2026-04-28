@@ -68,6 +68,13 @@ const userApi = {
       data: payload
     });
   },
+  activateMembership(payload) {
+    return request({
+      url: '/user/membership/activate',
+      method: 'POST',
+      data: payload
+    });
+  },
   uploadAvatar(filePath) {
     return uploadByBiz(filePath, 'user_avatar');
   }

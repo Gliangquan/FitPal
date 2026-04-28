@@ -18,6 +18,7 @@
           <text class="text-sm text-muted">咨询ID：{{ item.id }}</text>
           <text class="text-sm text-muted">{{ formatTime(item.createTime) }}</text>
         </view>
+        <text class="text-sm text-theme" v-if="item.userId">用户ID：{{ item.userId }}</text>
         <text class="question">{{ item.question || '（无内容）' }}</text>
         <view class="item-actions">
           <button class="btn-sub btn-opt" @tap="goOptimize(item)">减脂方案优化</button>
