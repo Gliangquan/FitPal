@@ -38,12 +38,6 @@
           <text @tap="forgetPassword">忘记密码</text>
         </view>
 
-        <view class="other-login">
-          <uni-divider text="其他登录方式" />
-          <view class="btn-wrapper">
-            <button class="btn-ghost" @tap="wechatLogin">微信一键登录</button>
-          </view>
-        </view>
       </view>
 
       <view v-else class="form-wrapper">
@@ -183,9 +177,6 @@ export default {
     forgetPassword() {
       uni.showToast({ title: '功能开发中', icon: 'none' });
     },
-    wechatLogin() {
-      uni.showToast({ title: '微信登录暂不可用', icon: 'none' });
-    },
     goHome() {
       uni.switchTab({
         url: '/pages/index/index',
@@ -200,8 +191,4 @@ export default {
 
 <style lang="scss">
 @import "@/styles/common.scss";
-
-.other-login {
-  margin-top: $spacing-lg;
-}
 </style>

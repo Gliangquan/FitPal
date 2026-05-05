@@ -1,4 +1,9 @@
-const BASE_URL = '/api';
+// #ifdef H5
+// const BASE_URL = '/api';
+// #endif
+// #ifndef H5
+const BASE_URL = 'http://127.0.0.1:9903/api';
+// #endif
 const TOKEN_KEY = 'fitpal_token';
 
 const showLoading = (show = true) => {

@@ -5,3 +5,4 @@ PyMySQL==1.1.1
 PyJWT==2.9.0
 requests==2.32.3
 minio==7.2.12
+cryptography>=41.0.0
