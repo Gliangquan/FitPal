@@ -76,7 +76,7 @@ JWT_EXPIRATION_MS = int(os.getenv("JWT_EXPIRATION_MS", str(DEFAULT_JWT_EXPIRATIO
 EXPORT_ROOT = Path(os.getenv("EXPORT_PATH", "./exports")).resolve()
 EXPORT_ROOT.mkdir(parents=True, exist_ok=True)
 
-_MINIO_ENDPOINT_RAW = os.getenv("MINIO_ENDPOINT", "http://85.137.247.55:9000").strip()
+_MINIO_ENDPOINT_RAW = os.getenv("MINIO_ENDPOINT", "http://127.0.0.1:9000").strip()
 _minio_url = urlparse(_MINIO_ENDPOINT_RAW) if "://" in _MINIO_ENDPOINT_RAW else None
 if _minio_url:
     _minio_host = (_minio_url.netloc or "").strip()
@@ -798,6 +798,8 @@ def get_bucket_and_prefix_by_biz(biz: str) -> Tuple[str, str]:
     if biz == "user_avatar":
         return MINIO_USER_AVATAR_BUCKET, MINIO_USER_AVATAR_PREFIX
     if biz == "community_post":
+        return MINIO_COMMUNITY_POST_BUCKET, MINIO_COMMUNITY_POST_PREFIX
+    if biz == "content_cover":
         return MINIO_COMMUNITY_POST_BUCKET, MINIO_COMMUNITY_POST_PREFIX
     raise BusinessException(ERR_PARAMS, "业务类型错误")
 

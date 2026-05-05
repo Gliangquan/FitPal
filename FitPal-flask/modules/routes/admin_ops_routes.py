@@ -619,7 +619,7 @@ def user_settings_privacy_update():
 def upload_file():
     file = request.files.get("file")
     biz = request.form.get("biz", "user_avatar")
-    if biz not in ("user_avatar", "community_post"):
+    if biz not in ("user_avatar", "community_post", "content_cover"):
         raise BusinessException(ERR_PARAMS, "业务类型错误")
     if not file:
         raise BusinessException(ERR_PARAMS, "文件不能为空")
