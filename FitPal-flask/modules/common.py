@@ -61,7 +61,7 @@ def build_database_url() -> str:
     host = os.getenv("DB_HOST", "localhost")
     port = int(os.getenv("DB_PORT", "3306"))
     user = os.getenv("DB_USER", "root")
-    password = os.getenv("DB_PASSWORD", "liangquan0302")
+    password = os.getenv("DB_PASSWORD", "root")
     name = os.getenv("DB_NAME", "fit")
     return f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}?charset=utf8mb4"
 
