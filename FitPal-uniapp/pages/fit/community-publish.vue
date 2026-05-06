@@ -18,7 +18,17 @@
         </uni-forms-item>
 
         <uni-forms-item label="分类">
-          <uni-data-checkbox v-model="form.category" :localdata="categories" mode="tag" />
+          <view class="category-list">
+            <view
+              v-for="(cat, idx) in categories"
+              :key="cat.value"
+              class="category-item"
+              :class="{ active: form.category === cat.value }"
+              @tap="form.category = cat.value"
+            >
+              {{ cat.text }}
+            </view>
+          </view>
         </uni-forms-item>
 
         <uni-forms-item label="内容">
@@ -97,13 +107,56 @@ export default {
     deleteImage(idx) {
       this.form.images.splice(idx, 1);
     },
+    isLocalTempFile(path) {
+      if (!path) return false;
+      const value = String(path).trim();
+      if (!value) return false;
+      // 微信临时文件 http://tmp/xxx 需要上传
+      if (value.startsWith('http://tmp/')) {
+        return true;
+      }
+      if (
+        value.startsWith('http://') ||
+        value.startsWith('https://') ||
+        value.startsWith('data:') ||
+        value.startsWith('/files/') ||
+        value.startsWith('/api/file/') ||
+        value.startsWith('/file/')
+      ) {
+        return false;
+      }
+      return (
+        value.startsWith('wxfile://') ||
+        value.startsWith('file://') ||
+        value.startsWith('blob:') ||
+        value.startsWith('/private/') ||
+        value.startsWith('/var/') ||
+        value.startsWith('/tmp/')
+      );
+    },
     async uploadImages() {
       if (!this.form.images.length) return [];
       const uploaded = [];
-      for (const filePath of this.form.images) {
-        const remotePath = await fitApi.uploadCommunityImage(filePath);
-        if (remotePath) {
-          uploaded.push(remotePath);
+      for (let i = 0; i < this.form.images.length; i++) {
+        const filePath = this.form.images[i];
+        if (!this.isLocalTempFile(filePath)) {
+          // 已是远程路径，直接使用
+          uploaded.push(filePath);
+          continue;
+        }
+        try {
+          console.log('[发布] 开始上传图片', filePath, `(${i+1}/${this.form.images.length})`);
+          const remotePath = await fitApi.uploadCommunityImage(filePath);
+          if (remotePath) {
+            uploaded.push(remotePath);
+            console.log('[发布] 图片上传成功', remotePath);
+          }
+          // 等待上传任务完全完成
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error('[发布] 单张图片上传失败', filePath, error);
+          uni.showToast({ title: '图片上传失败，请重试', icon: 'none' });
+          throw error; // 抛出错误，停止发布
         }
       }
       return uploaded;
@@ -116,11 +169,14 @@ export default {
 
       this.loading = true;
       try {
+        console.log('[发布] 开始上传图片');
         let imageUrls = [];
         if (this.form.images.length > 0) {
           imageUrls = await this.uploadImages();
+          console.log('[发布] 图片上传完成', imageUrls);
         }
         const imageUrlsText = imageUrls.length ? JSON.stringify(imageUrls) : undefined;
+        console.log('[发布] 准备提交帖子', { title: this.form.title, content: this.form.content, category: this.form.category, imageUrlsText });
 
         const result = await fitApi.addCommunityPost({
           title: this.form.title,
@@ -128,6 +184,7 @@ export default {
           category: this.form.category,
           imageUrls: imageUrlsText
         });
+        console.log('[发布] 发布成功', result);
 
         const badge = result?.badgeAwarded;
         uni.showToast({ title: badge ? `获得${badge.badgeName}` : '发布成功', icon: 'success' });
@@ -135,6 +192,7 @@ export default {
           uni.navigateBack();
         }, 700);
       } catch (error) {
+        console.error('[发布] 发布失败', error);
         uni.showToast({ title: error.message || '发布失败', icon: 'none' });
       } finally {
         this.loading = false;
@@ -240,6 +298,28 @@ export default {
 
   &:disabled {
     opacity: 0.55;
+  }
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.category-item {
+  padding: 12rpx 24rpx;
+  border-radius: 40rpx;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 24rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+
+  &.active {
+    background: #eff6ff;
+    color: #2f65f9;
+    border-color: #2f65f9;
   }
 }
 </style>

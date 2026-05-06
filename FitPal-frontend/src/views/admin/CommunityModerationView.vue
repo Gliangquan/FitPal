@@ -29,17 +29,17 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'imageUrls'">
-          <a-image-preview-group v-if="record.imageUrls && record.imageUrls.length > 0">
+          <a-image-preview-group v-if="record.imageList && record.imageList.length > 0">
             <a-image
-              v-for="(url, index) in record.imageUrls.slice(0, 3)"
+              v-for="(url, index) in record.imageList.slice(0, 3)"
               :key="index"
               :width="30"
               :height="30"
               :src="resolveFilePreviewUrl(url)"
               style="object-fit: cover; border-radius: 4px; margin-right: 4px;"
             />
-            <span v-if="record.imageUrls.length > 3" style="color: #999; font-size: 12px;">
-              +{{ record.imageUrls.length - 3 }}
+            <span v-if="record.imageList.length > 3" style="color: #999; font-size: 12px;">
+              +{{ record.imageList.length - 3 }}
             </span>
           </a-image-preview-group>
           <span v-else style="color: #999;">无图片</span>

@@ -250,6 +250,10 @@ export default {
       if (!path) return false;
       const value = String(path).trim();
       if (!value) return false;
+      // 微信临时文件 http://tmp/xxx 需要上传
+      if (value.startsWith('http://tmp/')) {
+        return true;
+      }
       if (
         value.startsWith('http://') ||
         value.startsWith('https://') ||
